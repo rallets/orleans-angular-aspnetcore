@@ -1,0 +1,6 @@
+/* You can add global styles to this file, and also import other style files */
+$image-directory: "assets/images";
+
+@import "~@ng-select/ng-select/themes/default.theme.css";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "scss/ng-select";

@@ -1,0 +1,8 @@
+<button type="button" class="btn btn-primary" (click)="onGetWarehouses()">Refresh</button>
+<button type="button" class="btn btn-primary" (click)="onCreateWarehouse()">Add</button>
+
+<ul>
+  <li *ngFor="let warehouse of (warehouses$ | async)">
+    {{ warehouse.code }} {{ warehouse.name}} {{ warehouse.creationDate | date:'shortDate'}}
+  </li>
+</ul>

@@ -1,0 +1,19 @@
+.slide-img {
+  width: auto;
+  height: 300px;
+
+  display: block;
+  margin: auto;
+}
+
+.carousel-caption {
+  // position: relative;
+  // right: 0;
+  // left: 0;
+
+  h4 a,
+  p {
+    color: orange;
+    font-weight: bold;
+  }
+}

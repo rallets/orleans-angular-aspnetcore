@@ -1,0 +1,25 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ data?.title }}</h4>
+    <button type="button" class="close" aria-label="Lukk" (click)="dismiss()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+
+    <div class="row">
+        <div class="col-2">
+            <i class="fa fa-fw fa-info-circle fa-4x text-info"></i>
+        </div>
+        <div class="col">
+            <p [innerHTML]="data?.body"></p>
+        </div>
+        <div class="col-2">
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-primary btn-modal" (click)="confirm()">OK</button>
+</div>

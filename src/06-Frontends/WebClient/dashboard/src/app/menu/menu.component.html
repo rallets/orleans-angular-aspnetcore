@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-md navbar-light bg-light">
+  <a class="navbar-brand" href="#">Orleans App <fa-icon [icon]="faDiceD20"></fa-icon></a>
+  <button class="navbar-toggler navbar-toggler-right" type="button" aria-controls="appNavigation"
+    [attr.aria-expanded]="!isCollapsed" aria-label="Toggle navigation" (click)="toggleMenu()">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="appNavigation" [ngbCollapse]="isCollapsed">
+    <div class="navbar-nav mr-auto">
+      <a class="nav-item nav-link" routerLink="" routerLinkActive="active">Home</a>
+      <a class="nav-item nav-link" routerLink="/orders" routerLinkActive="active">Orders</a>
+      <a class="nav-item nav-link" routerLink="/products" routerLinkActive="active">Products</a>
+      <a class="nav-item nav-link" routerLink="/warehouses" routerLinkActive="active">Warehouses</a>
+      <a class="nav-item nav-link" target="_blank" [href]="externalDashboardUrl">Orleans Dashboard</a>
+      <a class="nav-item nav-link" target="_blank"
+        href="https://github.com/rallets/orleans-angular-aspnetcore">Github</a>
+
+      <!-- <div class="nav-item dropdown" ngbDropdown>
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" ngbDropdownToggle>
+          Orders
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdownBasic1" ngbDropdownMenu>
+          <button class="dropdown-item">Add</button>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</nav>

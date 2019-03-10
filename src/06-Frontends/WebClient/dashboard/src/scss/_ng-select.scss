@@ -1,0 +1,22 @@
+// use ng-select-sm to have the same height as bootstrap input "sm"
+.ng-select.ng-select-sm.ng-select-single .ng-select-container {
+  height: $input-height-sm;
+}
+
+.ng-select.ng-select-sm .ng-select-container {
+  min-height: $input-height-sm;
+}
+
+// remove the dropdown height, so all items will be shown
+.ng-select.ng-select-dropdown-no-fixed-height {
+  .ng-dropdown-panel {
+    .ng-dropdown-panel-items {
+      max-height: none;
+    }
+  }
+}
+
+// dropdown items can be wider than the control
+.ng-dropdown-panel.ng-dropdown-panel-wider {
+  width: initial;
+}

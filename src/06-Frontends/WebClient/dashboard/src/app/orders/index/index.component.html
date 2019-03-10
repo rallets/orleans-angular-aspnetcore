@@ -1,0 +1,15 @@
+<button type="button" class="btn btn-primary" (click)="onGetOrders()">Refresh</button>
+<!-- <button type="button" class="btn btn-primary" (click)="onGetOrder()" >Get order</button> -->
+<button type="button" class="btn btn-primary" (click)="onCreateOrder()">Add</button>
+
+<ul>
+  <li *ngFor="let order of (orders$ | async)">
+    {{ order.date | date:'shortDate' }} {{ order.name}} {{ order.totalAmount | number:'1.1-2'}}
+    <ol>
+      <li *ngFor="let item of order.items">
+        {{ item.quantity | number:'1.0-2'}} x {{ item.product.description}} ({{ item.unitPrice | number:'1.1-2'}})
+      </li>
+    </ol>
+  </li>
+</ul>
+{{ orders | json }}

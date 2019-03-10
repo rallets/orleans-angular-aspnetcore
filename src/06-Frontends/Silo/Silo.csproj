@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <!-- see https://dotnet.github.io/orleans/Documentation/clusters_and_clients/configuration_guide/configuring_.NET_garbage_collection.html -->
+  <PropertyGroup>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.Counters" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="2.2.4" />
+    <PackageReference Include="OrleansDashboard" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\03-GrainInterfaces\GrainInterfaces\GrainInterfaces.csproj" />
+    <ProjectReference Include="..\..\04-Grains\Grains\Grains.csproj" />
+  </ItemGroup>
+
+</Project>
