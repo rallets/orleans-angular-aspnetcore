@@ -7,7 +7,7 @@ namespace GrainInterfaces.Products
 {
     public interface IProducts : Orleans.IGrainWithGuidKey
     {
-        Task<List<Product>> GetAll();
+        Task<Product[]> GetAll();
         Task<bool> Exists(Guid id);
         Task<Product> Add(Product product);
     }

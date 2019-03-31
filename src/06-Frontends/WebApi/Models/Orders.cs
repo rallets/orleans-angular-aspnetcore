@@ -19,7 +19,8 @@ namespace WebApi.Models.Orders
             Name = order.Name;
             Date = order.Date;
             TotalAmount = order.TotalAmount;
-            Items = order.Items.Select(x => new OrderItemViewModel(x)).ToList();
+            order.Items = order.Items ?? new List<OrderItem>();
+            Items = order.Items?.Select(x => new OrderItemViewModel(x)).ToList();
         }
 
         public Guid Id;
@@ -50,16 +51,18 @@ namespace WebApi.Models.Orders
             {
                 Id = product.Id;
                 Description = product.Name;
+                Price = product.Price;
             }
         }
 
         public Guid Id;
         public string Description;
+        public decimal Price;
     }
 
     public class OrderCreateRequest
     {
-        public decimal TotalAmount;
+        // public decimal TotalAmount;
         public string Name;
         public List<OrderCreateItemRequest> Items;
     }

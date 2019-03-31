@@ -69,6 +69,10 @@ namespace WebApi
         {
             var clientBuilder = new ClientBuilder()
                 .UseLocalhostClustering()
+                .Configure<SerializationProviderOptions>(_ =>
+                {
+                    _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufSerializer));
+                })
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "dev";

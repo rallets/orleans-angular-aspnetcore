@@ -14,17 +14,19 @@ namespace WebApi.Models.Products
         public ProductViewModel(Product product)
         {
             Id = product.Id;
+            CreationDate = product.CreationDate;
             Code = product.Code;
             Name = product.Name;
             Description = product.Description;
-            CreationDate = product.CreationDate;
+            Price = product.Price;
         }
 
         public Guid Id;
+        public DateTimeOffset CreationDate;
         public string Code;
         public string Name;
         public string Description;
-        public DateTimeOffset CreationDate;
+        public decimal Price;
     }
 
     public class ProductCreateRequest
@@ -32,6 +34,7 @@ namespace WebApi.Models.Products
         public string Code;
         public string Name;
         public string Description;
+        public decimal Price;
     }
 
 }

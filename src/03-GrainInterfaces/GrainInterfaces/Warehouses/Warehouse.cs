@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace GrainInterfaces.Products
+namespace GrainInterfaces.Warehouses
 {
-    public class Product
+    public class Warehouse
     {
         public Guid Id;
         public string Code;
         public string Name;
         public string Description;
         public DateTimeOffset CreationDate;
-        public decimal Price;
     }
 }

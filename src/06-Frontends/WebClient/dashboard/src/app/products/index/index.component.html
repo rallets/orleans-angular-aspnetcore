@@ -1,8 +1,25 @@
-<button type="button" class="btn btn-primary" (click)="onGetProducts()">Refresh</button>
-<button type="button" class="btn btn-primary" (click)="onCreateProduct()">Add</button>
+<div class="btn-group" role="group" aria-label="">
+  <button type="button" class="btn btn-primary" (click)="onGetProducts()">Refresh</button>
+  <button type="button" class="btn btn-primary" (click)="onCreateProduct()">Add</button>
+</div>
 
-<ul>
-  <li *ngFor="let product of (products$ | async)">
-    {{ product.code }} {{ product.name}} {{ product.creationDate | date:'shortDate'}}
-  </li>
-</ul>
+<table class="table table-sm table-striped table-bordered table-hover mt-2">
+  <thead>
+    <tr>
+      <th scope="col" class="text-right">Code</th>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
+      <th scope="col" class="text-right">Price</th>
+      <th scope="col" class="text-right">Created at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let product of (products$ | async)">
+      <th scope="row" class="text-right">{{ product.code }}</th>
+      <td>{{ product.name }}</td>
+      <td>{{ product.description }}</td>
+      <td class="text-right">{{ product.price | number:'1.2-2' }}</td>
+      <td class="text-right">{{ product.creationDate | date:'shortDate' }}</td>
+    </tr>
+  </tbody>
+</table>

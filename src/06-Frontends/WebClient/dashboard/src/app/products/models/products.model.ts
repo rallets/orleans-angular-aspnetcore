@@ -4,16 +4,18 @@ import { guid } from 'src/app/shared/types/guid.type';
 
 export class Product {
   @deserialize id: guid;
+  @deserializeAs(Date) creationDate: Date;
   @deserialize code: string;
   @deserialize name: string;
   @deserialize description: string;
-  @deserializeAs(Date) creationDate: Date;
+  @deserialize price: number;
 }
 
 export class ProductCreateRequest {
   code: string;
   name: string;
   description: string;
+  price: number;
 }
 
 export class Products {

@@ -18,24 +18,21 @@ namespace OrleansSilo.Products
     public class ProductsGrain : Grain<ProductsState>, IProducts
     {
         private readonly ILogger _logger;
-        
 
         public ProductsGrain(ILogger<ProductsGrain> logger)
         {
             _logger = logger;
         }
 
-        async Task<List<Product>> IProducts.GetAll()
+        async Task<Product[]> IProducts.GetAll()
         {
-            var result = new List<Product>();
+            var products = new List<Task<Product>>();
             foreach (var id in this.State.Products)
             {
                 var product = GrainFactory.GetGrain<IProduct>(id);
-                var state = await product.GetState();
-                
-                result.Add(state);
+                products.Add(product.GetState());
             }
-            return result;
+            return await Task.WhenAll(products);
         }
 
         async Task<Product> IProducts.Add(Product info)

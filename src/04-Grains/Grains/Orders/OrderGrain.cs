@@ -3,6 +3,8 @@ using GrainInterfaces.Products;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Providers;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OrleansSilo.Orders
@@ -19,15 +21,26 @@ namespace OrleansSilo.Orders
 
         async Task<Order> IOrder.Create(Order Order)
         {
-            foreach(var item in Order.Items)
+            var products = await GetProductsAsync(Order.Items);
+            foreach (var item in Order.Items)
             {
-                var product = GrainFactory.GetGrain<IProduct>(item.ProductId);
-                var state = await product.GetState();
-                item.Product = state;
+                item.Product = products.FirstOrDefault(p => p.Id == item.ProductId);
             }
+            Order.TotalAmount = Order.Items.Sum(item => item.Quantity * item.Product.Price);
             State = Order;
             await base.WriteStateAsync();
             return this.State;
+        }
+
+        private async Task<Product[]> GetProductsAsync(List<OrderItem> items)
+        {
+            var products = new List<Task<Product>>();
+            foreach (var item in items)
+            {
+                var product = GrainFactory.GetGrain<IProduct>(item.ProductId);
+                products.Add(product.GetState());
+            }
+            return await Task.WhenAll(products);
         }
 
         Task<Order> IOrder.GetState()

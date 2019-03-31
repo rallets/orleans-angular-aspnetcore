@@ -60,7 +60,7 @@ namespace OrleansSilo
             // example of calling grains from the initialized client
             var products = client.GetGrain<IProducts>(Guid.Empty);
             var response = await products.GetAll();
-            Console.WriteLine("\n\n find {0} products\n\n", response.Count);
+            Console.WriteLine("\n\n find {0} products\n\n", response.Length);
         }
     }
 }

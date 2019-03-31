@@ -27,10 +27,12 @@ export class OrderCreateComponent extends BaseModalComponent implements OnInit, 
 
   private nameof = nameofFactory<OrderCreateComponent>();
 
+  get name() { return this.form.controls[this.nameof('name')]; }
   get productId() { return this.form.controls[this.nameof('productId')]; }
   get quantity() { return this.form.controls[this.nameof('quantity')]; }
 
   form = new FormGroup({
+    name: new FormControl({ value: 'New order', disabled: false }, [Validators.required, Validators.maxLength(255)]),
     productId: new FormControl({ value: '', disabled: false }, [Validators.required]),
     quantity: new FormControl({ value: 1, disabled: false }, [Validators.min(1), Validators.max(intMaxValue)]),
   });
@@ -55,9 +57,10 @@ export class OrderCreateComponent extends BaseModalComponent implements OnInit, 
   }
 
   async save() {
+    const name = this.name.value as string;
     const pid = this.productId.value as guid;
     const qty = this.quantity.value as number;
-    if (!this.data || !pid || !qty) {
+    if (!this.data || !name || !pid || !qty) {
       return;
     }
     if (!this.form.valid) {
@@ -66,6 +69,7 @@ export class OrderCreateComponent extends BaseModalComponent implements OnInit, 
     }
 
     const request = new OrderCreateRequest();
+    request.name = name;
     request.items = [{ productId: pid, quantity: qty }];
 
     const delay = new Promise((resolve, _reject) => setTimeout(() => resolve(), this.DELAY_CLOSE_MS));

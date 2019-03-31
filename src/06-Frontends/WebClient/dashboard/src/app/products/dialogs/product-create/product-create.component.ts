@@ -7,7 +7,7 @@ import { LoadingStatusService } from '../../../shared/services/loading-status.se
 import { ProductCreateDataModel } from '../../models/products.model';
 import { ProductCreateRequest } from '../../models/products.model';
 import { BaseModalComponent } from 'src/app/shared/dialogs/base-modal.component';
-import { intMaxValue } from 'src/app/shared/constants/types.const';
+import { intMaxValue, decimalMaxValue, decimalMinValue } from 'src/app/shared/constants/types.const';
 import { ProductsStoreService } from '../../services/products-store.service';
 
 @Component({
@@ -25,11 +25,17 @@ export class ProductCreateComponent extends BaseModalComponent implements OnInit
   get code() { return this.form.controls[this.nameof('code')]; }
   get name() { return this.form.controls[this.nameof('name')]; }
   get description() { return this.form.controls[this.nameof('description')]; }
+  get price() { return this.form.controls[this.nameof('price')]; }
 
   form = new FormGroup({
     code: new FormControl({ value: '', disabled: false }, [Validators.required]),
     name: new FormControl({ value: '', disabled: false }, [Validators.required, Validators.maxLength(255)]),
     description: new FormControl({ value: '', disabled: false }, [Validators.maxLength(1024)]),
+    price: new FormControl({ value: 0, disabled: false }, [
+      Validators.required,
+      Validators.max(decimalMaxValue),
+      Validators.min(decimalMinValue)
+    ]),
   });
 
   constructor(
@@ -52,6 +58,7 @@ export class ProductCreateComponent extends BaseModalComponent implements OnInit
   async save() {
     const name = this.name.value as string;
     const code = this.code.value as string;
+    const price = this.price.value as number;
     if (!this.data || !code || !name) {
       return;
     }
@@ -64,6 +71,7 @@ export class ProductCreateComponent extends BaseModalComponent implements OnInit
     request.code = code;
     request.name = name;
     request.description = this.description.value;
+    request.price = price;
 
     const delay = new Promise((resolve, _reject) => setTimeout(() => resolve(), this.DELAY_CLOSE_MS));
 

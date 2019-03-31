@@ -5,12 +5,12 @@ import { guid } from 'src/app/shared/types/guid.type';
 export class OrderItemProduct {
   @deserialize id: guid;
   @deserialize description: string;
+  @deserialize price: number;
 }
 
 export class OrderItem {
   @deserializeAs(OrderItemProduct) product: OrderItemProduct;
   @deserialize quantity: number;
-  @deserialize unitPrice: number;
 }
 
 export class Order {
@@ -26,8 +26,7 @@ export class Orders {
 }
 
 export class OrderCreateRequest {
-  // totalAmount: number;
-  // name: string;
+  name: string;
   items: OrderCreateItemRequest[];
 }
 

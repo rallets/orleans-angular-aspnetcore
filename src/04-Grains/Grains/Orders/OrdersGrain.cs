@@ -17,23 +17,21 @@ namespace OrleansSilo.Orders
     public class OrdersGrain : Grain<OrdersState>, IOrders
     {
         private readonly ILogger _logger;
-        
 
         public OrdersGrain(ILogger<OrdersGrain> logger)
         {
             _logger = logger;
         }
 
-        async Task<List<Order>> IOrders.GetAll()
+        async Task<Order[]> IOrders.GetAll()
         {
-            var result = new List<Order>();
+            var orders = new List<Task<Order>>();
             foreach (var id in this.State.Orders)
             {
-                var Order = GrainFactory.GetGrain<IOrder>(id);
-                var state = await Order.GetState();
-                result.Add(state);
+                var order = GrainFactory.GetGrain<IOrder>(id);
+                orders.Add(order.GetState());
             }
-            return result;
+            return await Task.WhenAll(orders);
         }
 
         async Task<Order> IOrders.Add(Order info)

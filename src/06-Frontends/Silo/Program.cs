@@ -40,6 +40,10 @@ namespace OrleansSilo
             // define the cluster configuration
             var builder = new SiloHostBuilder()
                 .UseLocalhostClustering()
+                .Configure<SerializationProviderOptions>(_ =>
+                {
+                    _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufSerializer));
+                })
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "dev";

@@ -53,6 +53,7 @@ namespace WebApi.Controllers
                 Code = request.Code,
                 Name = request.Name,
                 Description = request.Description,
+                Price = request.Price,
             };
         }
 
