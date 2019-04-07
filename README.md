@@ -1,5 +1,9 @@
 # orleans-angular-aspnetcore
 
+## **_This is a draft_**
+
+---
+
 This is test-demo project on [Microsoft Orleans](https://github.com/dotnet/orleans) and its capabilities beeing used in a SPA application and a classical N-tier-approach like.
 I have only found example projects using basic IoT or games application, that fit (too) perfectly for Orleans.
 My goal is to try to convert the multi-tier approach (SPA, WebApi, Sql Server) to an Actor-oriented one, and be able to understand its limits, where it fits very well, and where is not. For doing this I'm trying to implement patterns and best-practice in a simple way, to make easy to understand for everyone.

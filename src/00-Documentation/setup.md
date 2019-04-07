@@ -1,5 +1,9 @@
 # Test project using Asp.NET Core, Angular and Microsoft Orleans
 
+## **_This is a draft_**
+
+---
+
 ## Develop mode
 
 Install Asp Net Core 2.2 SDK (> 2.2.301)
@@ -30,10 +34,17 @@ Based on [Orleans tutorial](https://dotnet.github.io/orleans/Documentation/tutor
    ```
 
 3. (optional) Run the Azure Storage Emulator
-4. in src/06-Frontends/Silo, run `dotnet run`
-5. in src/06-Frontends/WebApi, run `dotnet run`
-6. in src/06-Frontends/WebClient/dashboard, run ng-serve.bat (or run `npm install`, then `ng serve`)
-7. navigate to `http://localhost:4200/`
+4. in src/ > run `run-all.bat`
+
+Otherwise you can run every single project manually:
+
+* in src/06-Frontends/Silo > run `dotnet run`
+* in src/06-Frontends/WebApi > run `dotnet run`
+* in src/06-Frontends/WebClient/dashboard > run ng-serve.bat (or run `npm install`, then `ng serve`)
+
+Then open the SPA page:
+
+* navigate to `http://localhost:4200/`
 
 ## Disclaimer
 
