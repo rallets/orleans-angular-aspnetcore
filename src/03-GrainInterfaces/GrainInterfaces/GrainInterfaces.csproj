@@ -10,6 +10,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Orleans.ProtobufNet" Version="2.3.0" />
   </ItemGroup>
 
 </Project>

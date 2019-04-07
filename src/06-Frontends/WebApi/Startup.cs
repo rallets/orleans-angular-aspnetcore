@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GrainInterfaces.Serialization.ProtobufNet;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Configuration;
+using ProtoBuf.Meta;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace WebApi
 {
@@ -71,7 +70,9 @@ namespace WebApi
                 .UseLocalhostClustering()
                 .Configure<SerializationProviderOptions>(_ =>
                 {
-                    _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufSerializer));
+                    _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufNet.ProtobufNetSerializer).GetTypeInfo());
+
+                    RuntimeTypeModel.Default.Add(typeof(DateTimeOffset), false).SetSurrogate(typeof(DateTimeOffsetSurrogate));
                 })
                 .Configure<ClusterOptions>(options =>
                 {

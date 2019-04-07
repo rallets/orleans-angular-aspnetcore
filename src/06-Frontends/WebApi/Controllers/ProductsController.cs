@@ -1,12 +1,10 @@
-﻿using System;
+﻿using GrainInterfaces.Products;
+using Microsoft.AspNetCore.Mvc;
+using Orleans;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GrainInterfaces;
-using GrainInterfaces.Products;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Orleans;
 using WebApi.Models.Products;
 using static WebApi.Controllers.ProductsMapper;
 
@@ -41,7 +39,7 @@ namespace WebApi.Controllers
             var response = MapToViewModel(result);
             return response;
         }
-        
+
     }
 
     public static class ProductsMapper

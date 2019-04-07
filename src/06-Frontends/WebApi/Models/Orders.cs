@@ -40,7 +40,6 @@ namespace WebApi.Models.Orders
 
         public OrderItemProductViewModel Product;
         public decimal Quantity;
-        // public decimal UnitPrice;
     }
 
     public class OrderItemProductViewModel
@@ -50,19 +49,20 @@ namespace WebApi.Models.Orders
             if (product != null)
             {
                 Id = product.Id;
+                Code = product.Code;
                 Description = product.Name;
                 Price = product.Price;
             }
         }
 
         public Guid Id;
+        public string Code;
         public string Description;
         public decimal Price;
     }
 
     public class OrderCreateRequest
     {
-        // public decimal TotalAmount;
         public string Name;
         public List<OrderCreateItemRequest> Items;
     }

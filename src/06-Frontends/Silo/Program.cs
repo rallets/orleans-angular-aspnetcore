@@ -1,11 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using GrainInterfaces.Serialization.ProtobufNet;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.Statistics;
 using OrleansSilo.Products;
+using ProtoBuf.Meta;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace OrleansSilo
 {
@@ -42,7 +44,9 @@ namespace OrleansSilo
                 .UseLocalhostClustering()
                 .Configure<SerializationProviderOptions>(_ =>
                 {
-                    _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufSerializer));
+                    _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufNet.ProtobufNetSerializer).GetTypeInfo());
+
+                    RuntimeTypeModel.Default.Add(typeof(DateTimeOffset), false).SetSurrogate(typeof(DateTimeOffsetSurrogate));
                 })
                 .Configure<ClusterOptions>(options =>
                 {
