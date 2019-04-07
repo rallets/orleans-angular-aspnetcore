@@ -4,6 +4,7 @@ import { guid } from 'src/app/shared/types/guid.type';
 
 export class OrderItemProduct {
   @deserialize id: guid;
+  @deserialize code: string;
   @deserialize description: string;
   @deserialize price: number;
 }

@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { sharedComponentImports, sharedComponentProviders } from '@app/prislister/testing.shared';
+import { sharedComponentImports, sharedComponentProviders } from 'src/app/testing/testing.shared';
 import { ProductCreateDataModel } from '../../models/products.model';
 import { ProductCreateComponent } from './product-create.component';
 

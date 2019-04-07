@@ -6,43 +6,25 @@ import { nameofFactory } from '../../helpers/nameof-factory';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'ts-confirmation',
-  templateUrl: './confirmation.component.html',
-  styleUrls: ['./confirmation.component.scss']
+	selector: 'ts-confirmation',
+	templateUrl: './confirmation.component.html',
+	styleUrls: ['./confirmation.component.scss']
 })
 export class ConfirmationComponent extends BaseModalComponent implements OnInit {
 
-  @Input() data: ConfirmationModalDataModel;
+	@Input() data: ConfirmationModalDataModel;
 
-  private nameof = nameofFactory<ConfirmationComponent>();
+	private nameof = nameofFactory<ConfirmationComponent>();
 
-  get confirmation() { return this.form.controls[this.nameof('confirmation')]; }
+	constructor(protected activeModal: NgbActiveModal) {
+		super(activeModal);
+	}
 
-  form = new FormGroup({
-    confirmation: new FormControl({ value: false, disabled: true }, [Validators.requiredTrue]),
-  });
+	ngOnInit() {
+		this.data.title = this.data.title || 'Confirmation request';
+	}
 
-  constructor(protected activeModal: NgbActiveModal) {
-    super(activeModal);
-  }
-
-  ngOnInit() {
-    this.data.title = this.data.title || 'Confirmation request';
-
-    if (this.data.requireConfirmation) {
-      this.confirmation.enable();
-    }
-  }
-
-  confirm() {
-    this.confirmation.markAsTouched();
-    this.confirmation.markAsDirty();
-
-    if (!this.form.valid && !this.form.disabled) {
-      console.warn('Invalid form', this.form.errors);
-      return;
-    }
-
-    this.activeModal.close(true);
-  }
+	confirm() {
+		this.activeModal.close(true);
+	}
 }

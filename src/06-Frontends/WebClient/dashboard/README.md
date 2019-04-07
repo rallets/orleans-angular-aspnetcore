@@ -29,12 +29,15 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 ## Useful extensions for VS Code
 
 * [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template)
-* [TSLint](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-tslint-plugin)
-* [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
+* [Angular2-switcher](https://marketplace.visualstudio.com/items?itemName=infinity1207.angular2-switcher) – Navigate through template/js/scss/test
 * [Bracket Pair Colorizer](https://marketplace.visualstudio.com/items?itemName=CoenraadS.bracket-pair-colorizer-2)
 * [CSharp2TS](https://marketplace.visualstudio.com/items?itemName=rafaelsalguero.csharp2ts) - Convert C# class to Typescript
-* [Version Lens](https://marketplace.visualstudio.com/items?itemName=pflannery.vscode-versionlens) - show version information for package.json
-* [SCSS Formatter](https://marketplace.visualstudio.com/items?itemName=Sibiraj-S.vscode-scss-formatter) - Format helper for SCSS
 * [Duplicate action](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-duplicate)
-* [Angular2-switcher](https://marketplace.visualstudio.com/items?itemName=infinity1207.angular2-switcher) – Navigate through template/js/scss/test
+* [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
+* [SCSS Formatter](https://marketplace.visualstudio.com/items?itemName=Sibiraj-S.vscode-scss-formatter) - Format helper for SCSS
+* [TSLint](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-tslint-plugin)
+* [Version Lens](https://marketplace.visualstudio.com/items?itemName=pflannery.vscode-versionlens) - show version information for package.json
+
+## Useful Angular utils
+
 * [Angular Console](https://angularconsole.com) - UI for angular-cli

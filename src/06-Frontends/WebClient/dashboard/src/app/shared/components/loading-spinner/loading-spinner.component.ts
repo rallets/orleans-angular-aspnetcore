@@ -9,4 +9,3 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 export class LoadingSpinnerComponent {
   faSpinner = faSpinner;
 }
-

@@ -32,7 +32,7 @@ Based on [Orleans tutorial](https://dotnet.github.io/orleans/Documentation/tutor
 3. (optional) Run the Azure Storage Emulator
 4. in src/06-Frontends/Silo, run `dotnet run`
 5. in src/06-Frontends/WebApi, run `dotnet run`
-6. in src/06-Frontends/WebClient/dashboard, run `npm install`, then `ng serve`
+6. in src/06-Frontends/WebClient/dashboard, run ng-serve.bat (or run `npm install`, then `ng serve`)
 7. navigate to `http://localhost:4200/`
 
 ## Disclaimer

@@ -1,13 +1,13 @@
 import { WarehousesModule } from './warehouses.module';
 
 describe('WarehousesModule', () => {
-  let warehousesModule: WarehousesModule;
+	let warehousesModule: WarehousesModule;
 
-  beforeEach(() => {
-    warehousesModule = new WarehousesModule();
-  });
+	beforeEach(() => {
+		warehousesModule = new WarehousesModule();
+	});
 
-  it('should create an instance', () => {
-    expect(warehousesModule).toBeTruthy();
-  });
+	it('should create an instance', () => {
+		expect(warehousesModule).toBeTruthy();
+	});
 });
