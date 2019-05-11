@@ -8,6 +8,8 @@ namespace GrainInterfaces.Orders
     public interface IOrders : Orleans.IGrainWithGuidKey
     {
         Task<Order[]> GetAll();
+        Task<Order[]> GetAllNotDispatched();
+        Task SetAsDispatched(Guid orderGuid);
         Task<bool> Exists(Guid id);
         Task<Order> Add(Order product);
     }

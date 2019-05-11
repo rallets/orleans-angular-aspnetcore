@@ -1,4 +1,5 @@
 ﻿using GrainInterfaces;
+using GrainInterfaces.Inventories;
 using GrainInterfaces.Products;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -39,12 +40,23 @@ namespace OrleansSilo.Products
         {
             info.Id = Guid.NewGuid();
             info.CreationDate = DateTimeOffset.Now;
-            var product = GrainFactory.GetGrain<IProduct>(info.Id);
-            var result = await product.Create(info);
+
+            var g = GrainFactory.GetGrain<IProduct>(info.Id);
+            var product = await g.Create(info);
             State.Products.Add(info.Id);
             _logger.LogInformation($"Product created => {info.Id}");
+
+            // add the product in all inventories
+            var gi = GrainFactory.GetGrain<IInventories>(Guid.Empty);
+            var inventories = await gi.GetAll();
+            foreach(var inventory in inventories)
+            {
+                var gx = GrainFactory.GetGrain<IInventory>(inventory.Id);
+                await gx.AddProduct(info.Id);
+            }
+
             await base.WriteStateAsync();
-            return result;
+            return product;
         }
 
         Task<bool> IProducts.Exists(Guid id)

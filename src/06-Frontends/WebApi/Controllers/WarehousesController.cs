@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GrainInterfaces;
+using GrainInterfaces.Inventories;
+using GrainInterfaces.Products;
 using GrainInterfaces.Warehouses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
+using WebApi.Models.Inventories;
 using WebApi.Models.Warehouses;
 using static WebApi.Controllers.WarehousesMapper;
 
@@ -41,7 +44,31 @@ namespace WebApi.Controllers
             var response = MapToViewModel(result);
             return response;
         }
-        
+
+        [HttpGet]
+        [Route("{warehouseGuid:guid}/inventory/")]
+        public async Task<ActionResult<InventoryViewModel>> GetInventoryAsync(Guid warehouseGuid)
+        {
+            var gi = _orleansClient.GetGrain<IInventories>(Guid.Empty);
+            var exists = await gi.Exists(warehouseGuid);
+            if(!exists)
+            {
+                return NotFound();
+            }
+
+            List<Task> tasks = new List<Task>();
+
+            var inventoryTask = gi.Get(warehouseGuid);
+
+            var gp = _orleansClient.GetGrain<IProducts>(Guid.Empty);
+            var productsTask = gp.GetAll();
+
+            var inventory = await inventoryTask;
+            var products = await productsTask;
+
+            var response = MapToViewModel(inventory, products);
+            return response;
+        }
     }
 
     public static class WarehousesMapper
@@ -66,6 +93,11 @@ namespace WebApi.Controllers
             var result = new WarehousesViewModel();
             result.Warehouses = items.Select(x => new WarehouseViewModel(x)).ToList();
             return result;
+        }
+
+        public static InventoryViewModel MapToViewModel(Inventory item, Product[] products)
+        {
+            return new InventoryViewModel(item, products);
         }
     }
 }

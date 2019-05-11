@@ -58,7 +58,8 @@ namespace OrleansSilo
                 // .UseDashboard(options => { })
                 // .UsePerfCounterEnvironmentStatistics()
                 .AddAzureTableGrainStorage("TableStore", options => options.ConnectionString = "UseDevelopmentStorage=true")
-                .AddAzureBlobGrainStorage("BlobStore", options => options.ConnectionString = "UseDevelopmentStorage=true");
+                .AddAzureBlobGrainStorage("BlobStore", options => options.ConnectionString = "UseDevelopmentStorage=true")
+                .UseAzureTableReminderService(options => options.ConnectionString = "UseDevelopmentStorage=true");
 
             var host = builder.Build();
             await host.StartAsync();

@@ -1,10 +1,13 @@
 ﻿using GrainInterfaces;
+using GrainInterfaces.Inventories;
+using GrainInterfaces.Products;
 using GrainInterfaces.Warehouses;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Providers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OrleansSilo.Warehouses
@@ -45,6 +48,28 @@ namespace OrleansSilo.Warehouses
             var result = await Warehouse.Create(info);
             State.Warehouses.Add(info.Id);
             _logger.LogInformation($"Warehouse created => {info.Id}");
+
+            // add all products in the new inventory
+            var gp = GrainFactory.GetGrain<IProducts>(Guid.Empty);
+            var products = await gp.GetAll();
+            var stocks = products.ToDictionary(x => x.Id, x => new ProductStock
+            {
+                Active = true,
+                BookedQuantity = 0,
+                CurrentStockQuantity = 0,
+                SafetyStockQuantity = 10, // TODO: should this come from the Product ?
+            });
+            var inventory = new Inventory
+            {
+                Id = Guid.NewGuid(),
+                CreationDate = DateTimeOffset.Now,
+                ProductsStocks = stocks,
+                WarehouseCode = info.Id
+            };
+
+            var gi = GrainFactory.GetGrain<IInventories>(Guid.Empty);
+            var inventories = await gi.Add(inventory);
+
             await base.WriteStateAsync();
             return result;
         }

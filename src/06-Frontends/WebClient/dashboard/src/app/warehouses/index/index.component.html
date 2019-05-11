@@ -1,23 +1,62 @@
 <div class="btn-group" role="group" aria-label="">
-  <button type="button" class="btn btn-primary" (click)="onGetWarehouses()">Refresh</button>
-  <button type="button" class="btn btn-primary" (click)="onCreateWarehouse()">Add</button>
+	<button type="button" class="btn btn-primary" (click)="onGetWarehouses()">Refresh</button>
+	<button type="button" class="btn btn-primary" (click)="onCreateWarehouse()">Add</button>
 </div>
 
-<table class="table table-sm table-striped table-bordered table-hover mt-2">
-  <thead>
-    <tr>
-      <th scope="col" class="text-right">Code</th>
-      <th scope="col">Name</th>
-      <th scope="col">Description</th>
-      <th scope="col" class="text-right">Created at</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let warehouse of (warehouses$ | async)">
-      <th scope="row" class="text-right">{{ warehouse.code }}</th>
-      <td>{{ warehouse.name }}</td>
-      <td>{{ warehouse.description }}</td>
-      <td class="text-right">{{ warehouse.creationDate | date:'shortDate' }}</td>
-    </tr>
-  </tbody>
+<table class="table table-sm table-bordered mt-2">
+	<thead>
+		<tr>
+			<th scope="col" class="text-right">Code</th>
+			<th scope="col">Name</th>
+			<th scope="col">Description</th>
+			<th scope="col" class="text-right">Created at</th>
+			<th scope="col"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<ng-container *ngFor="let warehouse of (warehouses$ | async)">
+			<tr>
+				<th scope="row" class="text-right">{{ warehouse.code }}</th>
+				<td>{{ warehouse.name }}</td>
+				<td>{{ warehouse.description }}</td>
+				<td class="text-right">{{ warehouse.creationDate | date:'shortDate' }}</td>
+				<td class="text-right">
+					<button type="button" class="btn btn-primary"
+						(click)="onGetInventory(warehouse.id)">Inventory</button>
+
+					<!-- {{ warehouse | json }} -->
+				</td>
+			</tr>
+			<tr *ngIf="warehouse.inventory.productsStocks.length > 0">
+				<td></td>
+				<td colspan="4">
+					Inventory
+					<table class="table table-bordered m-0">
+						<thead>
+							<tr>
+								<th scope="col" class="text-right">Product</th>
+								<th scope="col">Description</th>
+								<th scope="col" class="text-right">active</th>
+								<th scope="col" class="text-right">currentStockQuantity</th>
+								<th scope="col" class="text-right">safetyStockQuantity</th>
+								<th scope="col" class="text-right">bookedQuantity</th>
+								<th scope="col" class="text-right">stateDescription</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr *ngFor="let stock of warehouse.inventory.productsStocks">
+								<td>{{ stock.product.code }}</td>
+								<td>{{ stock.product.description }}</td>
+								<td class="text-center">{{ stock.active ? 'x' : '' }}</td>
+								<td class="text-right">{{ stock.currentStockQuantity | number:'1.0-2' }}</td>
+								<td class="text-right">{{ stock.safetyStockQuantity | number:'1.0-2' }}</td>
+								<td class="text-right">{{ stock.bookedQuantity | number:'1.0-2' }}</td>
+								<td>{{ stock.stateDescription }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</ng-container>
+	</tbody>
 </table>

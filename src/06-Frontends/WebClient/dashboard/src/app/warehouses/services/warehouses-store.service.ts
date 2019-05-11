@@ -5,6 +5,8 @@ import { WarehousesBackendService } from './warehouses-backend.service';
 import { NotificationStoreService } from 'src/app/shared/services/notification-store.service';
 import { handleHttpError } from 'src/app/shared/helpers/http/http-error.helpers';
 import { NotificationLevel } from 'src/app/shared/models/notification.model';
+import { filter } from 'rxjs/operators';
+import { guid } from 'src/app/shared/types/guid.type';
 
 @Injectable({
 	providedIn: 'root'
@@ -30,10 +32,22 @@ export class WarehousesStoreService implements OnDestroy {
 		const items = this.backend.getWarehouses();
 		items.subscribe(result => {
 			this._warehouses.next(result.warehouses);
-			console.log(this._warehouses);
 		}, error => {
 			handleHttpError(error, this.notification);
 			this._warehouses.next([]);
+		});
+	}
+
+	getInventory(warehouseGuid: guid) {
+		const items = this.backend.getInventory(warehouseGuid);
+		items.subscribe(inventory => {
+			const warehouses = this._warehouses.getValue();
+			const idx = warehouses.findIndex(w => w.id === warehouseGuid);
+			warehouses[idx].inventory = inventory;
+			this._warehouses.next(warehouses);
+		}, error => {
+			handleHttpError(error, this.notification);
+			// this._warehouses.next([]);
 		});
 	}
 

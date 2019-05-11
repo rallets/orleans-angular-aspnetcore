@@ -1,4 +1,5 @@
-﻿using GrainInterfaces.Serialization.ProtobufNet;
+﻿using GrainInterfaces.Scheduled;
+using GrainInterfaces.Serialization.ProtobufNet;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -79,9 +80,11 @@ namespace WebApi
                     options.ClusterId = "dev";
                     options.ServiceId = "TestInventoryService";
                 })
+                .Configure<ProcessExitHandlingOptions>(options => options.FastKillOnProcessExit = false)
                 .ConfigureLogging(logging => logging.AddConsole());
 
             var client = clientBuilder.Build();
+
             client.Connect(async ex =>
             {  // replace Console with actual logging
                 Console.WriteLine(ex);
@@ -90,6 +93,15 @@ namespace WebApi
                 return true;
             }).Wait();
 
+            // startup the global reminders
+            {
+                var g = client.GetGrain<IInventoryAutoSupplying>(Guid.Empty);
+                g.Start();
+            }
+            {
+                var g = client.GetGrain<IOrderScheduledProcessing>(Guid.Empty);
+                g.Start();
+            }
             return client;
         }
     }

@@ -16,6 +16,7 @@ namespace WebApi.Models.Orders
         public OrderViewModel(Order order)
         {
             Id = order.Id;
+            Dispatched = order.Dispatched;
             Name = order.Name;
             Date = order.Date;
             TotalAmount = order.TotalAmount;
@@ -24,6 +25,7 @@ namespace WebApi.Models.Orders
         }
 
         public Guid Id;
+        public bool Dispatched;
         public string Name;
         public DateTimeOffset Date;
         public decimal TotalAmount;
