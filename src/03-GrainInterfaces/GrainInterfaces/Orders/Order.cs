@@ -21,6 +21,9 @@ namespace GrainInterfaces.Orders
         public List<OrderItem> Items;
         [ProtoMember(6)]
         public bool Dispatched;
+        [ProtoMember(7)]
+        public Guid AssignedInventory = Guid.Empty;
+
     }
 
     [ProtoContract]

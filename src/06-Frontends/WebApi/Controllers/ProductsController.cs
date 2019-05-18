@@ -14,7 +14,7 @@ namespace WebApi.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private IClusterClient _orleansClient;
+        private readonly IClusterClient _orleansClient;
 
         public ProductsController(IClusterClient orleansClient)
         {
@@ -62,8 +62,10 @@ namespace WebApi.Controllers
 
         public static ProductsViewModel MapToViewModel(IEnumerable<Product> items)
         {
-            var result = new ProductsViewModel();
-            result.Products = items.Select(x => new ProductViewModel(x)).ToList();
+            var result = new ProductsViewModel
+            {
+                Products = items.Select(x => new ProductViewModel(x)).ToList()
+            };
             return result;
         }
     }

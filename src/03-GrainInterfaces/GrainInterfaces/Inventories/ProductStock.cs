@@ -66,7 +66,7 @@ namespace GrainInterfaces.Inventories
                 {
                     return 0;
                 }
-                return SafetyStockQuantity + BookedQuantity - CurrentStockQuantity;
+                return BookedQuantity > 0 ? SafetyStockQuantity + BookedQuantity : 0;
             }
         }
     }

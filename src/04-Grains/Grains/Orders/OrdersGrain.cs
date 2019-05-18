@@ -26,7 +26,7 @@ namespace OrleansSilo.Orders
             _logger = logger;
         }
 
-        async Task<Order[]> IOrders.GetAll()
+        public async Task<Order[]> GetAll()
         {
             var orders = new List<Task<Order>>();
             foreach (var id in this.State.Orders)
@@ -37,47 +37,41 @@ namespace OrleansSilo.Orders
             return await Task.WhenAll(orders);
         }
 
-        async Task<Order[]> IOrders.GetAllNotDispatched()
+        public Task<Guid[]> GetAllNotDispatched()
         {
-            var orders = new List<Task<Order>>();
-            foreach (var id in this.State.OrdersNotDispatched)
-            {
-                var order = GrainFactory.GetGrain<IOrder>(id);
-                orders.Add(order.GetState());
-            }
-            return await Task.WhenAll(orders);
+            return Task.FromResult(this.State.OrdersNotDispatched.ToArray());
         }
 
-        async Task IOrders.SetAsDispatched(Guid orderGuid)
+        public async Task SetAsDispatched(Guid orderGuid)
         {
-            if(State.OrdersNotDispatched.Contains(orderGuid))
+            _logger.LogInformation($"Order set as dispatched and removed from list => Id: {orderGuid}");
+
+            if (State.OrdersNotDispatched.Contains(orderGuid))
             {
                 State.OrdersNotDispatched.Remove(orderGuid);
                 await base.WriteStateAsync();
             }
         }
 
-        async Task<Order> IOrders.Add(Order info)
+        public async Task<Order> Add(Order info)
         {
             info.Id = Guid.NewGuid();
             info.Date = DateTimeOffset.Now;
             var g = GrainFactory.GetGrain<IOrder>(info.Id);
             var order = await g.Create(info);
-            _logger.LogInformation($"Order created => Id: {order.Id} Dispatched: {order.Dispatched}");
+            _logger.LogInformation($"Order created => Id: {order.Id} Name: {order.Name} Dispatched: {order.Dispatched}");
 
-            if (!order.Dispatched)
-            {
-                // add order in the orders-pending list
-                State.OrdersNotDispatched.Add(order.Id);
-            }
 
+            State.OrdersNotDispatched.Add(order.Id);
             State.Orders.Add(order.Id);
-
             await base.WriteStateAsync();
+
+            order = await g.TryDispatch(true);
+            
             return order;
         }
 
-        Task<bool> IOrders.Exists(Guid id)
+        public Task<bool> Exists(Guid id)
         {
             var result = State.Orders.Contains(id);
             _logger.LogInformation($"Order exists {id} => {result}");

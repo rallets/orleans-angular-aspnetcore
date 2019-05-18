@@ -32,17 +32,29 @@ namespace OrleansSilo.Orders
             order.TotalAmount = order.Items.Sum(item => item.Quantity * item.Product.Price);
 
             State = order;
-
-            await this.TryDispatch(true);
+            await base.WriteStateAsync();
             return State;
         }
 
         public async Task<Order> TryDispatch(bool isNewOrder)
         {
-            // find best inventory
+            _logger.Info($"Order try to dispatch - Id: {State.Id} New: {isNewOrder}");
+
             var gis = GrainFactory.GetGrain<IInventories>(Guid.Empty);
-            var inventoryGuid = await gis.GetBestForProduct(State.Items.First().ProductId);
-            var gi = GrainFactory.GetGrain<IInventory>(inventoryGuid);
+
+            if (!await gis.Exists(State.AssignedInventory))
+            {
+                State.AssignedInventory = Guid.Empty;
+            }
+
+            if (State.AssignedInventory == Guid.Empty)
+            {
+                // find best inventory and store it, booked quantity is for inventory
+                var inventoryGuid = await gis.GetBestForProduct(State.Items.First().ProductId);
+                State.AssignedInventory = inventoryGuid;
+            }
+
+            var gi = GrainFactory.GetGrain<IInventory>(State.AssignedInventory);
 
             // try to dispatch all items, otherwise set order as "not processable"
             var isOrderProcessable = true;
@@ -74,7 +86,6 @@ namespace OrleansSilo.Orders
                 {
                     var produckStockRemaining = await gi.Deduct(item.ProductId, item.Quantity);
                     var isItemProcessable = (produckStockRemaining >= 0);
-                    if (!isItemProcessable) { }
                     isOrderProcessable &= isItemProcessable;
                 }
             }
@@ -91,6 +102,9 @@ namespace OrleansSilo.Orders
                 _logger.Info($"Order {State.Id} set as dispatched");
                 var gorders = GrainFactory.GetGrain<IOrders>(Guid.Empty);
                 await gorders.SetAsDispatched(State.Id);
+            } else
+            {
+                _logger.Info($"Order not processable - Id: {State.Id} New: {isNewOrder}");
             }
             await base.WriteStateAsync();
             return State;

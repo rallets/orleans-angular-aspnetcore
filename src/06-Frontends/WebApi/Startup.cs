@@ -72,7 +72,6 @@ namespace WebApi
                 .Configure<SerializationProviderOptions>(_ =>
                 {
                     _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufNet.ProtobufNetSerializer).GetTypeInfo());
-
                     RuntimeTypeModel.Default.Add(typeof(DateTimeOffset), false).SetSurrogate(typeof(DateTimeOffsetSurrogate));
                 })
                 .Configure<ClusterOptions>(options =>

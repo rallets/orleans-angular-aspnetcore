@@ -6,6 +6,7 @@ using Orleans;
 using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OrleansSilo.Scheduled
@@ -47,11 +48,12 @@ namespace OrleansSilo.Scheduled
             var tasks = new List<Task<Order>>();
             var g = GrainFactory.GetGrain<IOrders>(Guid.Empty);
             var orders = await g.GetAllNotDispatched();
-            foreach (var order in orders)
-            {
-                var orderGuid = order.Id;
 
-                _logger.Info($"Order try-to-dispatch required for order {orderGuid}");
+            var i = 0;
+            foreach (var orderGuid in orders)
+            {
+                i++;
+                _logger.Info($"Order try-to-dispatch required for order {orderGuid} {i}/{orders.Length}");
 
                 var go = GrainFactory.GetGrain<IOrder>(orderGuid);
                 var tryTask = go.TryDispatch(false);

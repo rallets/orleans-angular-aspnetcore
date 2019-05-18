@@ -27,7 +27,7 @@ namespace OrleansSilo.Inventories
             _logger = logger;
         }
 
-        async Task<Inventory[]> IInventories.GetAll()
+        public async Task<Inventory[]> GetAll()
         {
             var inventories = new List<Task<Inventory>>();
             foreach (var kvp in this.State.Inventories)
@@ -38,7 +38,7 @@ namespace OrleansSilo.Inventories
             return await Task.WhenAll(inventories);
         }
 
-        async Task<Guid> IInventories.GetBestForProduct(Guid productGuid)
+        public async Task<Guid> GetBestForProduct(Guid productGuid)
         {
             (Guid inventoryGuid, decimal qty) result = (Guid.Empty, decimal.MinValue);
             
@@ -56,7 +56,7 @@ namespace OrleansSilo.Inventories
             return result.inventoryGuid;
         }
 
-        async Task<Inventory> IInventories.Add(Inventory data)
+        public async Task<Inventory> Add(Inventory data)
         {
             data.Id = Guid.NewGuid();
             data.CreationDate = DateTimeOffset.Now;
@@ -68,14 +68,21 @@ namespace OrleansSilo.Inventories
             return result;
         }
 
-        Task<bool> IInventories.Exists(Guid warehouseGuid)
+        public Task<bool> Exists(Guid inventoryGuid)
+        {
+            var result = State.Inventories.Any(x => x.Key == inventoryGuid);
+            _logger.LogInformation($"Inventory with id {inventoryGuid} exists => {result}");
+            return Task.FromResult(result);
+        }
+
+        public Task<bool> ExistsWarehouse(Guid warehouseGuid)
         {
             var result = State.Inventories.Values.Any(x => x == warehouseGuid);
             _logger.LogInformation($"Inventory with warehouse id {warehouseGuid} exists => {result}");
             return Task.FromResult(result);
         }
 
-        async Task<Inventory> IInventories.Get(Guid warehouseGuid)
+        public async Task<Inventory> GetFromWarehouse(Guid warehouseGuid)
         {
             var id = State.Inventories.First(x => x.Value == warehouseGuid).Key;
             var g = GrainFactory.GetGrain<IInventory>(id);

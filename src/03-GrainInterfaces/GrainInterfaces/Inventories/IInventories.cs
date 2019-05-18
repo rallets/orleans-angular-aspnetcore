@@ -8,9 +8,10 @@ namespace GrainInterfaces.Inventories
     public interface IInventories : Orleans.IGrainWithGuidKey
     {
         Task<Inventory[]> GetAll();
-        Task<Guid> GetBestForProduct(Guid productGuid);
-        Task<Inventory> Get(Guid warehouseCode);
-        Task<bool> Exists(Guid warehouseCode);
+        Task<bool> Exists(Guid inventoryGuid);
         Task<Inventory> Add(Inventory inventory);
+        Task<Guid> GetBestForProduct(Guid productGuid);
+        Task<Inventory> GetFromWarehouse(Guid warehouseCode);
+        Task<bool> ExistsWarehouse(Guid warehouseCode);
     }
 }

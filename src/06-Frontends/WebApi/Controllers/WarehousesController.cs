@@ -19,7 +19,7 @@ namespace WebApi.Controllers
     [ApiController]
     public class WarehousesController : ControllerBase
     {
-        private IClusterClient _orleansClient;
+        private readonly IClusterClient _orleansClient;
 
         public WarehousesController(IClusterClient orleansClient)
         {
@@ -50,15 +50,13 @@ namespace WebApi.Controllers
         public async Task<ActionResult<InventoryViewModel>> GetInventoryAsync(Guid warehouseGuid)
         {
             var gi = _orleansClient.GetGrain<IInventories>(Guid.Empty);
-            var exists = await gi.Exists(warehouseGuid);
+            var exists = await gi.ExistsWarehouse(warehouseGuid);
             if(!exists)
             {
                 return NotFound();
             }
 
-            List<Task> tasks = new List<Task>();
-
-            var inventoryTask = gi.Get(warehouseGuid);
+            var inventoryTask = gi.GetFromWarehouse(warehouseGuid);
 
             var gp = _orleansClient.GetGrain<IProducts>(Guid.Empty);
             var productsTask = gp.GetAll();
@@ -90,8 +88,10 @@ namespace WebApi.Controllers
 
         public static WarehousesViewModel MapToViewModel(IEnumerable<Warehouse> items)
         {
-            var result = new WarehousesViewModel();
-            result.Warehouses = items.Select(x => new WarehouseViewModel(x)).ToList();
+            var result = new WarehousesViewModel
+            {
+                Warehouses = items.Select(x => new WarehouseViewModel(x)).ToList()
+            };
             return result;
         }
 
