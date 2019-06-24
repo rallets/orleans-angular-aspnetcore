@@ -28,10 +28,11 @@ namespace TestClient
 
         public static async Task<Guid> Add(IClusterClient client, string name)
         {
+            var productId = Guid.NewGuid();
             var price = Math.Round(Convert.ToDecimal(new Random().NextDouble() * 1000), 2);
 
-            var products = client.GetGrain<IProducts>(Guid.Empty);
-            var response = await products.Add(new Product
+            var product = client.GetGrain<IProduct>(productId);
+            var response = await product.Create(new Product
             {
                 Code = $"Product {name}",
                 CreationDate = DateTimeOffset.Now,
@@ -59,8 +60,23 @@ namespace TestClient
                 async item =>
                 {
                     var name = $"{item.ToString("000")}/{batchSize}";
-                    var productGuid = await Add(client, name);
-                    result.Add(productGuid);
+                    //var productGuid = await Add(client, name);
+
+                    var productId = Guid.NewGuid();
+                    var price = Math.Round(Convert.ToDecimal(new Random().NextDouble() * 1000), 2);
+
+                    var product = client.GetGrain<IProduct>(productId);
+                    var response = await product.Create(new Product
+                    {
+                        Code = $"Product {name}",
+                        CreationDate = DateTimeOffset.Now,
+                        Description = $"Product description {name}",
+                        Name = $"Product name {name}",
+                        Price = price
+                    });
+                    Console.WriteLine($"Added product {name} {response.Id}");
+
+                    result.Add(response.Id);
                 },
                 maxDegreeOfParalellism: maxDegreeOfParalellism);
 

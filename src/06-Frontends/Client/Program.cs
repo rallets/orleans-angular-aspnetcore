@@ -101,7 +101,7 @@ namespace OrleansSilo
         {
             int numWarehouses = 2;
             int numProducts = 100;
-            int numOrders = 1000;
+            int numOrders = 100;
 
             var warehouses = await Test_Warehouses.GetAll(client);
             for(int n = warehouses.Length; n < numWarehouses; n++)
@@ -111,11 +111,18 @@ namespace OrleansSilo
             }
 
             var products = await Test_Products.GetAll(client);
-            for (int n = products.Length; n < numProducts; n++)
+            if (products.Length < numProducts)
             { 
-                var name = (n + 1).ToString("000");
-                await Test_Products.Add(client, name);
+                await Test_Products.AddBatch(client, numProducts - products.Length, 100);
             }
+
+            products = await Test_Products.GetAll(client);
+            if(products.Length < numProducts)
+            {
+                var x = "wait for streaming";
+            }
+
+            await Test_Orders.GetOrdersStatsCache(client);
 
             // await Test_Orders.WaitForAllDispatched(client);
             var orders = await Test_Orders.GetAll(client);
@@ -127,6 +134,8 @@ namespace OrleansSilo
 
                 await Test_Orders.WaitForAllDispatched(client);
             }
+
+            await Test_Orders.GetOrdersStatsCache(client);
         }
     }
 }

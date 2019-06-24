@@ -1,8 +1,29 @@
-<div class="btn-group" role="group" aria-label="">
-	<button type="button" class="btn btn-primary" (click)="onGetOrders()">Refresh</button>
-	<!-- <button type="button" class="btn btn-primary" (click)="onGetOrder()" >Get order</button> -->
-	<button type="button" class="btn btn-primary" (click)="onCreateOrder()">Add</button>
+<!-- <div class="container"> -->
+<div class="row">
+	<div class="col-auto mr-auto">
+		<div class="btn-group align-left" role="group" aria-label="">
+			<button type="button" class="btn btn-primary" (click)="onGetOrders()">Refresh</button>
+			<!-- <button type="button" class="btn btn-primary" (click)="onGetOrder()" >Get order</button> -->
+			<button type="button" class="btn btn-primary" (click)="onCreateOrder()">Add</button>
+		</div>
+	</div>
+
+	<div class="col-auto">
+		<ng-container *ngIf="stats$ | async as stats">
+			<ul class="list-group list-group-horizontal">
+				<li class="list-group-item p-2">
+					All
+					<span class="badge badge-primary badge-pill">{{ stats.all }}</span>
+				</li>
+				<li class="list-group-item p-2">
+					Not dispatched
+					<span class="badge badge-warning badge-pill">{{ stats.notDispatched }}</span>
+				</li>
+			</ul>
+		</ng-container>
+	</div>
 </div>
+<!-- </div> -->
 
 <table class="table table-sm table-bordered mt-2">
 	<thead>

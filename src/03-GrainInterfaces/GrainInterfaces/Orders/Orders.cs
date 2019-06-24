@@ -8,4 +8,10 @@ namespace GrainInterfaces.Orders
         public List<Guid> Items;
         public DateTimeOffset LastUpdateDate;
     }
+
+    public class OrdersStats
+    {
+        public int Orders = 0;
+        public int OrdersNotDispatched = 0;
+    }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OrdersBackendService } from '../services/orders-backend.service';
-import { Order, OrderCreateDataModel } from '../models/orders.model';
+import { Order, OrderCreateDataModel, OrdersStats } from '../models/orders.model';
 import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { Observable, combineLatest } from 'rxjs';
 import { OrdersStoreService } from '../services/orders-store.service';
@@ -20,6 +20,7 @@ import { nameofFactory } from 'src/app/shared/helpers/nameof-factory';
 export class IndexComponent implements OnInit {
 	loading$: Observable<boolean>;
 	orders$: Observable<Order[]>;
+	stats$: Observable<OrdersStats>;
 
 	private _orders$: Observable<Order[]>;
 	nameofOrder = nameofFactory<Order>();
@@ -35,8 +36,10 @@ export class IndexComponent implements OnInit {
 		this.loading$ = this.loadingStatus.loadingDelayed$;
 		this._orders$ = this.store.orders$;
 		this.orders$ = this.createView(this._orders$);
+		this.stats$ = this.store.stats$;
 
 		this.store.getOrders();
+		this.store.getStats(5000);
 	}
 
 	onGetOrders() {

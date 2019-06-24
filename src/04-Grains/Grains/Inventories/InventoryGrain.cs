@@ -46,7 +46,7 @@ namespace OrleansSilo.Inventories
 
         Task<ProductStock> IInventory.GetProductState(Guid ProductGuid)
         {
-            var stockState = State.ProductsStocks.First(x => x.Key == ProductGuid).Value;
+            var stockState = State.ProductsStocks.FirstOrDefault(x => x.Key == ProductGuid).Value;
             return Task.FromResult(stockState);
         }
 

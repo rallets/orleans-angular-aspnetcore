@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
+using Orleans.Hosting;
 using ProtoBuf.Meta;
 using System;
 using System.Reflection;
@@ -47,7 +48,7 @@ namespace WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -69,6 +70,12 @@ namespace WebApi
         {
             var clientBuilder = new ClientBuilder()
                 .UseLocalhostClustering()
+                .Configure<ClientMessagingOptions>(options =>
+                {
+                    // Needed by Reactive pool: reduced message timeout to ease promise break testing
+                    options.ResponseTimeout = TimeSpan.FromSeconds(10);
+                    options.ResponseTimeoutWithDebugger = TimeSpan.FromSeconds(10);
+                })
                 .Configure<SerializationProviderOptions>(_ =>
                 {
                     _.SerializationProviders.Add(typeof(Orleans.Serialization.ProtobufNet.ProtobufNetSerializer).GetTypeInfo());
@@ -80,7 +87,9 @@ namespace WebApi
                     options.ServiceId = "TestInventoryService";
                 })
                 .Configure<ProcessExitHandlingOptions>(options => options.FastKillOnProcessExit = false)
-                .ConfigureLogging(logging => logging.AddConsole());
+                .ConfigureLogging(logging => logging.AddConsole())
+
+                .AddSimpleMessageStreamProvider("SMSProvider");
 
             var client = clientBuilder.Build();
 

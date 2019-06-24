@@ -25,6 +25,7 @@ export class OrderCreateComponent extends BaseModalComponent implements OnInit, 
 
 	loading$: Observable<boolean>;
 	products$: Observable<Product[]>;
+	numProducts: number = 0;
 	intMaxValue = intMaxValue;
 
 	private nameof = nameofFactory<OrderCreateComponent>();
@@ -54,6 +55,7 @@ export class OrderCreateComponent extends BaseModalComponent implements OnInit, 
 		this.loading$ = this.loadingStatus.loading$;
 		this.products$ = this.productsStore.products$.pipe(
 			map((products) => {
+				this.numProducts = products.length;
 				const items = orderBy(products, this.nameofProduct('creationDate'), 'desc') as Product[];
 				return items.slice(0, 10);
 			})

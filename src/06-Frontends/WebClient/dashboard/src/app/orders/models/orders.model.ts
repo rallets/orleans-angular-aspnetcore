@@ -27,6 +27,11 @@ export class Orders {
 	@deserializeAs(Order) orders: Order[];
 }
 
+export class OrdersStats {
+	@deserialize all: number;
+	@deserialize notDispatched: number;
+}
+
 export class OrderCreateRequest {
 	name: string;
 	items: OrderCreateItemRequest[];

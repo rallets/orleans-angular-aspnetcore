@@ -12,6 +12,20 @@ namespace TestClient
 {
     public static class Test_Orders
     {
+        public static async Task<OrdersStats> GetOrdersStatsCache(IClusterClient client)
+        {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            var g = client.GetGrain<IOrdersStatsCache>(Guid.Empty);
+            var response = await g.GetAsync();
+
+            watch.Stop();
+            Console.WriteLine($"Found {response.Orders} orders, {response.OrdersNotDispatched} not dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+
+            return response;
+        }
+
         public static async Task<Order[]> GetAll(IClusterClient client)
         {
             Stopwatch watch = new Stopwatch();

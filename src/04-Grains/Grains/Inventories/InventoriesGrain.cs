@@ -46,6 +46,11 @@ namespace OrleansSilo.Inventories
             {
                 var g = GrainFactory.GetGrain<IInventory>(kvp.Key);
                 var stockState = await g.GetProductState(productGuid);
+                if (stockState == null)
+                {
+                    continue;
+                }
+
                 var stockQty = stockState.CurrentStockQuantity - stockState.BookedQuantity;
                 if (stockQty > result.qty)
                 {

@@ -9,6 +9,6 @@ namespace GrainInterfaces.Products
     {
         Task<Product[]> GetAll();
         Task<bool> Exists(Guid id);
-        Task<Product> Add(Product product);
+        //Task<Product> Add(Product product);
     }
 }

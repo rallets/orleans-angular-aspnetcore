@@ -33,9 +33,9 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<ProductViewModel>> PostAsync(ProductCreateRequest request)
         {
-            var product = MapFromRequest(request);
-            var products = _orleansClient.GetGrain<IProducts>(Guid.Empty);
-            var result = await products.Add(product);
+            var item = MapFromRequest(request);
+            var product = _orleansClient.GetGrain<IProduct>(Guid.NewGuid());
+            var result = await product.Create(item);
             var response = MapToViewModel(result);
             return response;
         }
@@ -48,6 +48,7 @@ namespace WebApi.Controllers
         {
             return new Product
             {
+                CreationDate = DateTimeOffset.Now,
                 Code = request.Code,
                 Name = request.Name,
                 Description = request.Description,

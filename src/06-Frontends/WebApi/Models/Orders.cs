@@ -74,4 +74,16 @@ namespace WebApi.Models.Orders
         public Guid ProductId;
         public decimal Quantity;
     }
+
+    public class OrdersStatsViewModel
+    {
+        public OrdersStatsViewModel(OrdersStats stats)
+        {
+            All = stats.Orders;
+            NotDispatched = stats.OrdersNotDispatched;
+        }
+
+        public int All;
+        public int NotDispatched;
+    }
 }

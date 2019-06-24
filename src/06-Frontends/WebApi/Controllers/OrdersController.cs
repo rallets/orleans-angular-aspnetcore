@@ -33,6 +33,16 @@ namespace WebApi.Controllers
             return response;
         }
 
+        [HttpGet]
+        [Route("stats")]
+        public async Task<ActionResult<OrdersStatsViewModel>> GetStatsAsync()
+        {
+            var statsCache = _orleansClient.GetGrain<IOrdersStatsCache>(Guid.Empty);
+            var stats = await statsCache.GetAsync();
+            var result = new OrdersStatsViewModel(stats);
+            return result;
+        }
+
         [HttpPost]
         public async Task<ActionResult<OrderViewModel>> PostAsync(OrderCreateRequest request)
         {
@@ -52,9 +62,9 @@ namespace WebApi.Controllers
                 }
             }
 
-            var Order = MapFromRequest(request);
-            var Orders = _orleansClient.GetGrain<IOrders>(Guid.Empty);
-            var result = await Orders.Add(Order);
+            var order = MapFromRequest(request);
+            var orders = _orleansClient.GetGrain<IOrders>(Guid.Empty);
+            var result = await orders.Add(order);
             var response = MapToViewModel(result);
             return response;
         }
