@@ -1,25 +1,30 @@
-<div class="btn-group" role="group" aria-label="">
-  <button type="button" class="btn btn-primary" (click)="onGetProducts()">Refresh</button>
-  <button type="button" class="btn btn-primary" (click)="onCreateProduct()">Add</button>
+<h2>Products' current state</h2>
+<div class="btn-toolbar mb-2 float-right" role="toolbar">
+	<div class="btn-group mr-2" role="group">
+		<button type="button" class="btn btn-primary" (click)="onGetProducts()">Refresh</button>
+	</div>
+	<div class="btn-group" role="group">
+		<button type="button" class="btn btn-primary" (click)="onCreateProduct()">Add</button>
+	</div>
 </div>
 
 <table class="table table-sm table-striped table-bordered table-hover mt-2">
-  <thead>
-    <tr>
-      <th scope="col" class="text-right">Code</th>
-      <th scope="col">Name</th>
-      <th scope="col">Description</th>
-      <th scope="col" class="text-right">Price</th>
-      <th scope="col" class="text-right">Created at</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let product of (products$ | async)">
-      <th scope="row" class="text-right">{{ product.code }}</th>
-      <td>{{ product.name }}</td>
-      <td>{{ product.description }}</td>
-      <td class="text-right">{{ product.price | number:'1.2-2' }}</td>
-      <td class="text-right">{{ product.creationDate | date:'shortDate' }}</td>
-    </tr>
-  </tbody>
+	<thead>
+		<tr>
+			<th scope="col">Code</th>
+			<th scope="col">Name</th>
+			<th scope="col">Description</th>
+			<th scope="col" class="text-right">Price</th>
+			<th scope="col" class="text-right">Created at</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let product of (products$ | async)">
+			<th scope="row">{{ product.code }}</th>
+			<td>{{ product.name }}</td>
+			<td>{{ product.description }}</td>
+			<td class="text-right">{{ product.price | number:'1.2-2' }}</td>
+			<td class="text-right">{{ product.creationDate | date:'shortDate' }}</td>
+		</tr>
+	</tbody>
 </table>

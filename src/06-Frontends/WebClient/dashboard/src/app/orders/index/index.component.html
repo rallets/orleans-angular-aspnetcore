@@ -1,14 +1,6 @@
-<!-- <div class="container"> -->
+<h2>Orders' current state</h2>
 <div class="row">
 	<div class="col-auto mr-auto">
-		<div class="btn-group align-left" role="group" aria-label="">
-			<button type="button" class="btn btn-primary" (click)="onGetOrders()">Refresh</button>
-			<!-- <button type="button" class="btn btn-primary" (click)="onGetOrder()" >Get order</button> -->
-			<button type="button" class="btn btn-primary" (click)="onCreateOrder()">Add</button>
-		</div>
-	</div>
-
-	<div class="col-auto">
 		<ng-container *ngIf="stats$ | async as stats">
 			<ul class="list-group list-group-horizontal">
 				<li class="list-group-item p-2">
@@ -21,6 +13,17 @@
 				</li>
 			</ul>
 		</ng-container>
+	</div>
+
+	<div class="col-auto ">
+		<div class="btn-toolbar mb-2 float-right" role="toolbar">
+			<div class="btn-group mr-2" role="group">
+				<button type="button" class="btn btn-primary" (click)="onGetOrders()">Refresh</button>
+			</div>
+			<div class="btn-group" role="group">
+				<button type="button" class="btn btn-primary" (click)="onCreateOrder()">Add</button>
+			</div>
+		</div>
 	</div>
 </div>
 <!-- </div> -->
@@ -48,7 +51,7 @@
 				<table class="table table-bordered m-0">
 					<thead>
 						<tr>
-							<th scope="col" class="text-right">Code</th>
+							<th scope="col">Code</th>
 							<th scope="col">Description</th>
 							<th scope="col" class="text-right">Qty</th>
 							<th scope="col" class="text-right">Price</th>

@@ -1,6 +1,11 @@
-<div class="btn-group" role="group" aria-label="">
-	<button type="button" class="btn btn-primary" (click)="onGetWarehouses()">Refresh</button>
-	<button type="button" class="btn btn-primary" (click)="onCreateWarehouse()">Add</button>
+<h2>Warehouses' current state</h2>
+<div class="btn-toolbar mb-2 float-right" role="toolbar">
+	<div class="btn-group mr-2" role="group" aria-label="">
+		<button type="button" class="btn btn-primary" (click)="onGetWarehouses()">Refresh</button>
+	</div>
+	<div class="btn-group" role="group" aria-label="">
+		<button type="button" class="btn btn-primary" (click)="onCreateWarehouse()">Add</button>
+	</div>
 </div>
 
 <table class="table table-sm table-bordered mt-2">
@@ -21,8 +26,8 @@
 				<td>{{ warehouse.description }}</td>
 				<td class="text-right">{{ warehouse.creationDate | date:'shortDate' }}</td>
 				<td class="text-right">
-					<button type="button" class="btn btn-primary"
-						(click)="onGetInventory(warehouse.id)">Inventory</button>
+					<button type="button" class="btn btn-primary" (click)="onGetInventory(warehouse.id)">Show inventory
+						state</button>
 
 					<!-- {{ warehouse | json }} -->
 				</td>
@@ -30,17 +35,17 @@
 			<tr *ngIf="warehouse.inventory.productsStocks.length > 0">
 				<td></td>
 				<td colspan="4">
-					Inventory
+					<h3>Current inventory state</h3>
 					<table class="table table-bordered m-0">
 						<thead>
 							<tr>
-								<th scope="col" class="text-right">Product</th>
+								<th scope="col">Product</th>
 								<th scope="col">Description</th>
-								<th scope="col" class="text-right">active</th>
-								<th scope="col" class="text-right">currentStockQuantity</th>
-								<th scope="col" class="text-right">safetyStockQuantity</th>
-								<th scope="col" class="text-right">bookedQuantity</th>
-								<th scope="col" class="text-right">stateDescription</th>
+								<th scope="col" class="text-right">Active</th>
+								<th scope="col" class="text-right">Current stock qty</th>
+								<th scope="col" class="text-right">Safety stock qty</th>
+								<th scope="col" class="text-right">Booked qty</th>
+								<th scope="col" class="text-right">State</th>
 							</tr>
 						</thead>
 						<tbody>

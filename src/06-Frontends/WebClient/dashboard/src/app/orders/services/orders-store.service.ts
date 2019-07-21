@@ -36,7 +36,6 @@ export class OrdersStoreService implements OnDestroy {
 		const items = this.backend.getOrders();
 		items.subscribe(result => {
 			this._orders.next(result.orders);
-			// console.log(this._orders);
 		}, error => {
 			handleHttpError(error, this.notification);
 			this._orders.next([]);
@@ -47,7 +46,6 @@ export class OrdersStoreService implements OnDestroy {
 		do {
 			try {
 				const result = await this.backend.getStats().toPromise();
-				console.log(result);
 				this._stats.next(result);
 			} catch (e) {
 				// ignore error, can be just a timeout (by design)

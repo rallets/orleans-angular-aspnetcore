@@ -10,6 +10,8 @@ import { orderBy } from 'lodash-es';
 import { WarehouseCreateComponent } from '../dialogs/warehouse-create/warehouse-create.component';
 import { nameofFactory } from 'src/app/shared/helpers/nameof-factory';
 import { guid } from 'src/app/shared/types/guid.type';
+import { ProductStock } from '../models/inventories.model';
+import { Product } from 'src/app/products/models/products.model';
 
 @Component({
 	selector: 'app-warehouses-index',
@@ -22,6 +24,8 @@ export class IndexComponent implements OnInit {
 
 	private _warehouses$: Observable<Warehouse[]>;
 	nameofWarehouse = nameofFactory<Warehouse>();
+	nameofProductStock = nameofFactory<ProductStock>();
+	nameofProduct = nameofFactory<Product>();
 
 	constructor(
 		private loadingStatus: LoadingStatusService,
@@ -68,8 +72,11 @@ export class IndexComponent implements OnInit {
 			// debounceTime(200),
 			// distinctUntilChanged(),
 			map(([warehouses]) => {
-				const items = orderBy(warehouses, this.nameofWarehouse('creationDate'), 'desc') as Warehouse[];
-				return items.slice(0, 10);
+				const items = orderBy(warehouses, this.nameofWarehouse('code'), 'asc') as Warehouse[];
+				items.forEach(item => {
+					item.inventory.productsStocks = orderBy(item.inventory.productsStocks, `${this.nameofProductStock('product')}.${this.nameofProduct('code')}`, 'asc') as ProductStock[];
+				});
+				return items.slice(0, 100);
 			})
 		);
 	}

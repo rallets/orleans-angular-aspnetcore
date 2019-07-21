@@ -60,22 +60,6 @@ export class IndexComponent implements OnInit {
 		} catch { /* form closed */ }
 	}
 
-	// onAddOrder() {
-	//   const request = new OrderRequest();
-	//   request.name = 'order';
-	//   request.totalAmount = 100;
-	//   request.items = [{
-	//     productId: '5cfab5ac-8640-4955-a541-7031166c6817',
-	//     quantity: 1
-	//   } as OrderItemRequest];
-
-	//   const result = this.backendService.postOrder(request);
-	//   result.subscribe(data => {
-	//     console.log(data);
-	//     this.orders.push(data);
-	//   });
-	// }
-
 	private createView(
 		orders$: Observable<Order[]>,
 	) {
@@ -85,7 +69,7 @@ export class IndexComponent implements OnInit {
 			// distinctUntilChanged(),
 			map(([orders]) => {
 				const items = orderBy(orders, this.nameofOrder('date'), 'desc') as Order[];
-				return items.slice(0, 10);
+				return items.slice(0, 100);
 			})
 		);
 	}

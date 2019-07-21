@@ -33,7 +33,6 @@ export class ProductsBackendService {
 	async createProduct(request: ProductCreateRequest): Promise<Product> {
 		const url = `${this.baseUrl}`;
 
-		console.log(request);
 		return this.http.post<Product>(url, request).pipe(
 			map(response => Deserialize(response, Product)),
 		).toPromise();

@@ -14,7 +14,6 @@ export class ProductStock {
 export class Inventory {
 	constructor() {
 		this.productsStocks = [];
-		// console.log('constr', this.productsStocks);
 	}
 
 	@deserialize id: string;

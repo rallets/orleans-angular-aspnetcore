@@ -31,7 +31,6 @@ export class OrdersBackendService {
 	}
 
 	getStats(): Observable<OrdersStats> {
-		console.log('Getting new stats...');
 		const url = `${this.baseUrl}/stats`;
 
 		return this.http.get<OrdersStats>(url).pipe(
@@ -43,7 +42,6 @@ export class OrdersBackendService {
 	async createOrder(request: OrderCreateRequest): Promise<Order> {
 		const url = `${this.baseUrl}`;
 
-		console.log(request);
 		return this.http.post<Order>(url, request).pipe(
 			map(response => Deserialize(response, Order)),
 		).toPromise();

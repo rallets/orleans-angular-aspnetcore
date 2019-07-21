@@ -30,7 +30,6 @@ export class ProductsStoreService implements OnDestroy {
 		const items = this.backend.getProducts();
 		items.subscribe(result => {
 			this._products.next(result.products);
-			// console.log(this._products);
 		}, error => {
 			handleHttpError(error, this.notification);
 			this._products.next([]);

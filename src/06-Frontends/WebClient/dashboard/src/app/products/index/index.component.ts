@@ -63,8 +63,8 @@ export class IndexComponent implements OnInit {
 			// debounceTime(200),
 			// distinctUntilChanged(),
 			map(([products]) => {
-				const items = orderBy(products, this.nameofProduct('creationDate'), 'desc') as Product[];
-				return items.slice(0, 10);
+				const items = orderBy(products, this.nameofProduct('code'), 'asc') as Product[];
+				return items.slice(0, 100);
 			})
 		);
 	}

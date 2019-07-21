@@ -50,7 +50,6 @@ export class WarehousesBackendService {
 	async createWarehouse(request: WarehouseCreateRequest): Promise<Warehouse> {
 		const url = `${this.baseUrl}`;
 
-		console.log(request);
 		return this.http.post<Warehouse>(url, request).pipe(
 			map(response => {
 				var result = Deserialize(response, Warehouse);
