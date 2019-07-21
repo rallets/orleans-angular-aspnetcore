@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Providers.Streams.AzureQueue;
 using ProtoBuf.Meta;
 using System;
 using System.Reflection;
@@ -73,8 +74,8 @@ namespace WebApi
                 .Configure<ClientMessagingOptions>(options =>
                 {
                     // Needed by Reactive pool: reduced message timeout to ease promise break testing
-                    options.ResponseTimeout = TimeSpan.FromSeconds(10);
-                    options.ResponseTimeoutWithDebugger = TimeSpan.FromSeconds(10);
+                    options.ResponseTimeout = TimeSpan.FromSeconds(30*60); // was 10
+                    options.ResponseTimeoutWithDebugger = TimeSpan.FromSeconds(30 * 60); // was 10
                 })
                 .Configure<SerializationProviderOptions>(_ =>
                 {
@@ -89,7 +90,10 @@ namespace WebApi
                 .Configure<ProcessExitHandlingOptions>(options => options.FastKillOnProcessExit = false)
                 .ConfigureLogging(logging => logging.AddConsole())
 
-                .AddSimpleMessageStreamProvider("SMSProvider");
+                // .AddSimpleMessageStreamProvider("SMSProvider");
+                .AddAzureQueueStreams<AzureQueueDataAdapterV2>("AzureQueueProvider", optionsBuilder => optionsBuilder.Configure(options => { options.ConnectionString = "UseDevelopmentStorage=true"; }))
+                // .AddAzureTableGrainStorage("PubSubStore", options => { options.ConnectionString = "UseDevelopmentStorage=true"; });
+                ;
 
             var client = clientBuilder.Build();
 

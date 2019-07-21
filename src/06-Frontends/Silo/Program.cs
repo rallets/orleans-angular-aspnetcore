@@ -79,8 +79,8 @@ namespace OrleansSilo
                 .Configure<SiloMessagingOptions>(options =>
                 {
                     // Needed by Reactive pool: reduced message timeout to ease promise break testing
-                    options.ResponseTimeout = TimeSpan.FromSeconds(10);
-                    options.ResponseTimeoutWithDebugger = TimeSpan.FromSeconds(10);
+                    options.ResponseTimeout = TimeSpan.FromSeconds(30 * 60); // was 10
+                    options.ResponseTimeoutWithDebugger = TimeSpan.FromSeconds(30 * 60); // was 10
                 })
                 .Configure<ClientMessagingOptions>(options =>
                 {
@@ -110,10 +110,11 @@ namespace OrleansSilo
 
                 .UseAzureTableReminderService(options => options.ConnectionString = "UseDevelopmentStorage=true")
 
-                .AddSimpleMessageStreamProvider("SMSProvider")
-                .AddMemoryGrainStorage("PubSubStore")
-                // .AddAzureQueueStreams<AzureQueueDataAdapterV2>("AzureQueueProvider", optionsBuilder => optionsBuilder.Configure(options => { options.ConnectionString = "Secret"; }))
-                //.AddAzureTableGrainStorage("PubSubStore", options => { options.ConnectionString = "UseDevelopmentStorage=true"; })
+                // .AddSimpleMessageStreamProvider("SMSProvider")
+                // .AddMemoryGrainStorage("PubSubStore")
+                .AddAzureQueueStreams<AzureQueueDataAdapterV2>("AzureQueueProvider", optionsBuilder => optionsBuilder.Configure(options => { options.ConnectionString = "UseDevelopmentStorage=true"; }))
+                .AddAzureTableGrainStorage("PubSubStore", options => { options.ConnectionString = "UseDevelopmentStorage=true"; })
+                // .AddMemoryGrainStorage("PubSubStore")
 
             .Build();
         }

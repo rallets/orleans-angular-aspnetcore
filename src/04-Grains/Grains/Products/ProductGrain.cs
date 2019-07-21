@@ -26,7 +26,7 @@ namespace OrleansSilo.Products
         {
             product.Id = this.GetPrimaryKey();
 
-            var streamProvider = GetStreamProvider("SMSProvider");
+            var streamProvider = GetStreamProvider("AzureQueueProvider");
             var stream = streamProvider.GetStream<Product>(Guid.Empty, "ProductCreatedStream");
 
             // NOTE: In SMS task completes when the onNextAsync completes on the receiver. 

@@ -1,6 +1,7 @@
 ﻿using GrainInterfaces.Inventories;
 using Microsoft.Extensions.Logging;
 using Orleans;
+using Orleans.Runtime;
 using Orleans.Providers;
 using System;
 using System.Linq;
@@ -17,6 +18,8 @@ namespace OrleansSilo.Inventories
         {
             _logger = logger;
         }
+
+        private Guid GrainKey => this.GetPrimaryKey();
 
         async Task<Inventory> IInventory.Create(Inventory data)
         {
@@ -53,9 +56,13 @@ namespace OrleansSilo.Inventories
         async Task<decimal> IInventory.Increase(Guid productGuid, decimal quantity)
         {
             var productStock = State.ProductsStocks.First(x => x.Key == productGuid).Value;
-            if (productStock.BookedQuantity > 0)
+
+            var currentStockQuantity = productStock.CurrentStockQuantity;
+            var bookedQuantity = productStock.BookedQuantity;
+
+            if (bookedQuantity > 0)
             {
-                if (quantity >= productStock.BookedQuantity)
+                if (quantity >= bookedQuantity)
                 {
                     productStock.CurrentStockQuantity += quantity;
                     productStock.BookedQuantity = 0;
@@ -69,6 +76,7 @@ namespace OrleansSilo.Inventories
             {
                 productStock.CurrentStockQuantity += quantity;
             }
+            _logger.Info($"Inventory {GrainKey} - Product {productGuid} increased from {currentStockQuantity}/{bookedQuantity} to {productStock.CurrentStockQuantity}/{productStock.BookedQuantity}");
             await base.WriteStateAsync();
             return productStock.CurrentStockQuantity;
         }
@@ -76,17 +84,23 @@ namespace OrleansSilo.Inventories
         async Task<decimal> IInventory.Deduct(Guid productGuid, decimal quantity)
         {
             var productStock = State.ProductsStocks.First(x => x.Key == productGuid).Value;
+            var currentStockQuantity = productStock.CurrentStockQuantity;
+            var bookedQuantity = productStock.BookedQuantity;
 
-            if (productStock.CurrentStockQuantity >= quantity)
+            if (currentStockQuantity >= quantity)
             {
                 // order can be dispatched
                 productStock.CurrentStockQuantity -= quantity;
+                _logger.Info($"Inventory {GrainKey} - Product {productGuid} deducted from {currentStockQuantity}/{bookedQuantity} to {productStock.CurrentStockQuantity}/{productStock.BookedQuantity}");
                 await base.WriteStateAsync();
                 return productStock.CurrentStockQuantity;
             }
 
             // order cannot be dispatched, add in the booked queue
             productStock.BookedQuantity += quantity;
+
+            _logger.Info($"Inventory {GrainKey} - Product {productGuid} deducted from {currentStockQuantity}/{bookedQuantity} to {productStock.CurrentStockQuantity}/{productStock.BookedQuantity}");
+
             await base.WriteStateAsync();
             return -productStock.BookedQuantity;
         }

@@ -20,7 +20,7 @@ namespace TestClient
             var response = await warehouses.GetAll();
 
             watch.Stop();
-            Console.WriteLine($"Found {response.Length} warehouses - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"Found {response.Length} warehouses - Time elapsed: {watch.Elapsed.TotalMilliseconds} ms");
 
             return response;
         }
@@ -62,7 +62,7 @@ namespace TestClient
                 maxDegreeOfParalellism: maxDegreeOfParalellism);
 
             watch.Stop();
-            Console.WriteLine($"Added {result.Count} warehouses - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"Added {result.Count} warehouses - Time elapsed: {watch.Elapsed.TotalMilliseconds} ms - {(result.Count == 0 ? 0 : watch.Elapsed.TotalMilliseconds / result.Count)} for warehouse");
 
             return result;
         }

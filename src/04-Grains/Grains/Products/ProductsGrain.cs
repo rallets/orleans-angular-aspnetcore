@@ -33,7 +33,7 @@ namespace OrleansSilo.Products
         {
             _logger.Info($"{nameof(ProductsGrain)} => OnActivateAsync");
 
-            var streamProvider = GetStreamProvider("SMSProvider");
+            var streamProvider = GetStreamProvider("AzureQueueProvider");
             var stream = streamProvider.GetStream<Product>(this.GetPrimaryKey(), "ProductCreatedStream");
             _sub = await stream.SubscribeAsync(this.OnNextAsync, this.OnErrorAsync, this.OnCompletedAsync);
             var handles = await stream.GetAllSubscriptionHandles();

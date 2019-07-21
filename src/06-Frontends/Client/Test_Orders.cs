@@ -21,7 +21,7 @@ namespace TestClient
             var response = await g.GetAsync();
 
             watch.Stop();
-            Console.WriteLine($"Found {response.Orders} orders, {response.OrdersNotDispatched} not dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"Found {response.Orders} orders, {response.OrdersNotDispatched} not dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds} ms");
 
             return response;
         }
@@ -35,7 +35,7 @@ namespace TestClient
             var response = await g.GetAll();
 
             watch.Stop();
-            Console.WriteLine($"Found {response.Length} orders - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"Found {response.Length} orders - Time elapsed: {watch.Elapsed.TotalMilliseconds} ms");
 
             return response;
         }
@@ -49,7 +49,7 @@ namespace TestClient
             var response = await g.GetAllNotDispatched();
 
             watch.Stop();
-            Console.WriteLine($"Found {response.Length} orders not dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"Found {response.Length} orders not dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds} ms");
 
             return response;
         }
@@ -71,7 +71,7 @@ namespace TestClient
             } while (orders.Length != 0);
 
             watch.Stop();
-            Console.WriteLine($"All orders are dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"All orders are dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds} ms");
         }
 
         public static async Task<Guid> Add(IClusterClient client, string name)
@@ -125,7 +125,7 @@ namespace TestClient
                 maxDegreeOfParalellism: maxDegreeOfParalellism);
 
             watch.Stop();
-            Console.WriteLine($"Added {result.Count} orders - Time elapsed: {watch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"Added {result.Count} orders - Time elapsed: {watch.Elapsed.TotalMilliseconds}ms - {(result.Count == 0 ? 0 : watch.Elapsed.TotalMilliseconds / result.Count)} for order");
 
             return result;
         }
