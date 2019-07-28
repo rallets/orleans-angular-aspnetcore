@@ -7,7 +7,7 @@ namespace GrainInterfaces.Orders
 {
     [ProtoContract]
     [Serializable]
-    public class Order
+    public class OrderCreateRequest
     {
         [ProtoMember(1)]
         public Guid Id;
@@ -18,17 +18,15 @@ namespace GrainInterfaces.Orders
         [ProtoMember(4)]
         public decimal TotalAmount;
         [ProtoMember(5)]
-        public List<OrderItem> Items;
+        public List<OrderItemCreateRequest> Items;
         [ProtoMember(6)]
-        public bool Dispatched;
-        [ProtoMember(7)]
-        public Guid AssignedInventory = Guid.Empty;
+        public Guid? AssignedInventory;
 
     }
 
     [ProtoContract]
     [Serializable]
-    public class OrderItem
+    public class OrderItemCreateRequest
     {
         [ProtoMember(1)]
         public Guid ProductId;

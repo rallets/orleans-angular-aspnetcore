@@ -7,8 +7,9 @@ namespace GrainInterfaces.Orders
 {
     public interface IOrder : Orleans.IGrainWithGuidKey
     {
-        Task<Order> Create(Order product);
-        Task<Order> TryDispatch(bool isNewOrder);
-        Task<Order> GetState();
+        Task<OrderState> Create(OrderCreateRequest request);
+        Task<OrderState> TryDispatch(bool isNewOrder);
+        Task<OrderState> GetState();
+        Task<List<OrderEventInfo>> GetEvents();
     }
 }

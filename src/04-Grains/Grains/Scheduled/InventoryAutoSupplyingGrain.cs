@@ -44,8 +44,8 @@ namespace OrleansSilo.Scheduled
             _logger.Info($"Reminder {reminderName} received a reminder");
 
             var tasks = new List<Task<decimal>>();
-            var g = GrainFactory.GetGrain<IInventories>(Guid.Empty);
-            var inventories = await g.GetAll(); // TODO: maybe it can expose a list of products that need to be replenished
+            // TODO: maybe inventory can just expose a list of products that need to be replenished
+            var inventories = await GrainFactory.GetGrain<IInventories>(Guid.Empty).GetAll();
             foreach (var inventory in inventories)
             {
                 IInventory gi = null;

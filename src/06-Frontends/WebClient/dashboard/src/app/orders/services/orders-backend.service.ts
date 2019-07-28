@@ -4,7 +4,8 @@ import { environment } from '../../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap, share } from 'rxjs/operators';
 import { Deserialize } from 'cerialize';
-import { Orders, Order, OrderCreateRequest, OrdersStats } from '../models/orders.model';
+import { Orders, Order, OrderCreateRequest, OrdersStats, OrderEvents } from '../models/orders.model';
+import { guid } from 'src/app/shared/types/guid.type';
 
 const httpOptions = {
 	headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -26,6 +27,15 @@ export class OrdersBackendService {
 
 		return this.http.get<Orders>(url).pipe(
 			map(response => Deserialize(response, Orders)),
+			share()
+		);
+	}
+
+	getOrderEvents(orderGuid: guid): Observable<OrderEvents> {
+		const url = `${this.baseUrl}/${orderGuid}/events`;
+
+		return this.http.get<OrderEvents>(url).pipe(
+			map(response => Deserialize(response, OrderEvents)),
 			share()
 		);
 	}

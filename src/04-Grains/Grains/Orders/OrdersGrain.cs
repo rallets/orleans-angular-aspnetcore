@@ -47,19 +47,19 @@ namespace OrleansSilo.Orders
             await base.WriteStateAsync();
         }
 
-        public async Task<Order[]> GetAll()
+        public async Task<OrderState[]> GetAll()
         {
-            var orders = new List<Task<Order>>();
+            var orders = new List<Task<OrderState>>();
             foreach (var id in this.State.Orders)
             {
-                var order = GrainFactory.GetGrain<IOrder>(id);
-                orders.Add(order.GetState());
+                var task = GrainFactory.GetGrain<IOrder>(id).GetState();
+                orders.Add(task);
             }
             return await Task.WhenAll(orders);
         }
 
         // [AlwaysInterleave]
-        public Task<Guid[]> GetAllNotDispatched()
+        public Task<Guid[]> GetNotDispatched()
         {
             return Task.FromResult(this.State.OrdersNotDispatched.ToArray());
         }
@@ -75,13 +75,13 @@ namespace OrleansSilo.Orders
             }
         }
 
-        public async Task<Order> Add(Order info)
+        public async Task<OrderState> Add(OrderCreateRequest info)
         {
             info.Id = Guid.NewGuid();
             info.Date = DateTimeOffset.Now;
             var g = GrainFactory.GetGrain<IOrder>(info.Id);
             var order = await g.Create(info);
-            _logger.LogInformation($"Order created => Id: {order.Id} Name: {order.Name} Dispatched: {order.Dispatched}");
+            _logger.LogInformation($"Order created => Id: {order.Id} Name: {order.Name} Dispatched: {order.DispatchedDate}");
 
             State.OrdersNotDispatched.Add(order.Id);
             State.Orders.Add(order.Id);

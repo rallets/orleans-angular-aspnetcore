@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OrdersBackendService } from '../services/orders-backend.service';
-import { Order, OrderCreateDataModel, OrdersStats } from '../models/orders.model';
+import { Order, OrderCreateDataModel, OrdersStats, OrderEvent } from '../models/orders.model';
 import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { Observable, combineLatest } from 'rxjs';
 import { OrdersStoreService } from '../services/orders-store.service';
@@ -11,6 +11,7 @@ import { debounceTime, map } from 'rxjs/operators';
 import { orderBy } from 'lodash-es';
 import { OrderCreateComponent } from '../dialogs/order-create/order-create.component';
 import { nameofFactory } from 'src/app/shared/helpers/nameof-factory';
+import { guid } from 'src/app/shared/types/guid.type';
 
 @Component({
 	selector: 'app-orders-index',
@@ -21,9 +22,11 @@ export class IndexComponent implements OnInit {
 	loading$: Observable<boolean>;
 	orders$: Observable<Order[]>;
 	stats$: Observable<OrdersStats>;
+	events$: Observable<string[]>;
 
 	private _orders$: Observable<Order[]>;
 	nameofOrder = nameofFactory<Order>();
+	nameofOrderEvent = nameofFactory<OrderEvent>();
 
 	constructor(
 		private loadingStatus: LoadingStatusService,
@@ -44,6 +47,10 @@ export class IndexComponent implements OnInit {
 
 	onGetOrders() {
 		this.store.getOrders();
+	}
+
+	onGetEvents(orderGuid: guid) {
+		this.store.getOrderEvents(orderGuid);
 	}
 
 	async onCreateOrder() {
@@ -69,6 +76,9 @@ export class IndexComponent implements OnInit {
 			// distinctUntilChanged(),
 			map(([orders]) => {
 				const items = orderBy(orders, this.nameofOrder('date'), 'desc') as Order[];
+				items.forEach(item => {
+					item.events = orderBy(item.events, this.nameofOrderEvent('date'), 'asc') as OrderEvent[];
+				});
 				return items.slice(0, 100);
 			})
 		);

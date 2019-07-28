@@ -14,6 +14,16 @@ export class OrderItem {
 	@deserialize quantity: number;
 }
 
+export class OrderEvent {
+	@deserialize name: string;
+	@deserializeAs(Date) date: Date;
+	@deserialize description: string;
+}
+
+export class OrderEvents {
+	@deserializeAs(OrderEvent) events: OrderEvent[];
+}
+
 export class Order {
 	@deserialize id: guid;
 	@deserialize dispatched: boolean;
@@ -21,6 +31,8 @@ export class Order {
 	@deserialize name: string;
 	@deserialize totalAmount: number;
 	@deserializeAs(OrderItem) items: OrderItem[];
+
+	@deserializeAs(OrderEvent) events: OrderEvent[];
 }
 
 export class Orders {

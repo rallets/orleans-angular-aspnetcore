@@ -26,7 +26,7 @@ namespace TestClient
             return response;
         }
 
-        public static async Task<Order[]> GetAll(IClusterClient client)
+        public static async Task<OrderState[]> GetAll(IClusterClient client)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
@@ -46,7 +46,7 @@ namespace TestClient
             watch.Start();
 
             var g = client.GetGrain<IOrders>(Guid.Empty);
-            var response = await g.GetAllNotDispatched();
+            var response = await g.GetNotDispatched();
 
             watch.Stop();
             Console.WriteLine($"Found {response.Length} orders not dispatched - Time elapsed: {watch.Elapsed.TotalMilliseconds} ms");
@@ -86,12 +86,12 @@ namespace TestClient
             var product = products.OrderBy(x => Guid.NewGuid()).First();
 
             var g = client.GetGrain<IOrders>(Guid.Empty);
-            var response = await g.Add(new Order
+            var response = await g.Add(new OrderCreateRequest
             {
                 Date = DateTimeOffset.Now,
-                Items = new List<OrderItem>
+                Items = new List<OrderItemCreateRequest>
                 {
-                    new OrderItem
+                    new OrderItemCreateRequest
                     {
                         ProductId = product.Id,
                         Quantity = qty

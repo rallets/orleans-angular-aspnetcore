@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Runtime.Configuration;
 using Orleans.Providers.Streams.AzureQueue;
 using OrleansSilo.Products;
 using ProtoBuf.Meta;
@@ -10,6 +11,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+
 
 // TODO: use user-secrets - from https://www.twilio.com/blog/2018/05/user-secrets-in-a-net-core-console-app.html
 namespace OrleansSilo
@@ -115,6 +117,8 @@ namespace OrleansSilo
                 .AddAzureQueueStreams<AzureQueueDataAdapterV2>("AzureQueueProvider", optionsBuilder => optionsBuilder.Configure(options => { options.ConnectionString = "UseDevelopmentStorage=true"; }))
                 .AddAzureTableGrainStorage("PubSubStore", options => { options.ConnectionString = "UseDevelopmentStorage=true"; })
                 // .AddMemoryGrainStorage("PubSubStore")
+
+                .AddLogStorageBasedLogConsistencyProvider("LogStorage")
 
             .Build();
         }

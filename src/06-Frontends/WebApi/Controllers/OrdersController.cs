@@ -25,10 +25,24 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Route("{orderGuid:Guid}/events")]
+        public async Task<ActionResult<OrderEventsViewModel>> GetOrderEventsAsync(Guid orderGuid)
+        {
+            var exists = await _orleansClient.GetGrain<IOrders>(Guid.Empty).Exists(orderGuid);
+            if(!exists)
+            {
+                return NotFound();
+            }
+
+            var result = await _orleansClient.GetGrain<IOrder>(orderGuid).GetEvents();
+            var response = MapToViewModel(result);
+            return response;
+        }
+
+        [HttpGet]
         public async Task<ActionResult<OrdersViewModel>> GetAllAsync()
         {
-            var Orders = _orleansClient.GetGrain<IOrders>(Guid.Empty);
-            var result = await Orders.GetAll();
+            var result = await _orleansClient.GetGrain<IOrders>(Guid.Empty).GetAll();
             var response = MapToViewModel(result);
             return response;
         }
@@ -37,19 +51,17 @@ namespace WebApi.Controllers
         [Route("stats")]
         public async Task<ActionResult<OrdersStatsViewModel>> GetStatsAsync()
         {
-            var statsCache = _orleansClient.GetGrain<IOrdersStatsCache>(Guid.Empty);
-            var stats = await statsCache.GetAsync();
+            var stats = await _orleansClient.GetGrain<IOrdersStatsCache>(Guid.Empty).GetAsync();
             var result = new OrdersStatsViewModel(stats);
             return result;
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrderViewModel>> PostAsync(OrderCreateRequest request)
+        public async Task<ActionResult<OrderViewModel>> PostAsync(Models.Orders.OrderCreateRequest request)
         {
             foreach(var item in request.Items)
             {
-                var products = _orleansClient.GetGrain<IProducts>(Guid.Empty);
-                var exists = await products.Exists(item.ProductId);
+                var exists = await _orleansClient.GetGrain<IProducts>(Guid.Empty).Exists(item.ProductId);
                 if(!exists)
                 {
                     return NotFound();
@@ -63,8 +75,7 @@ namespace WebApi.Controllers
             }
 
             var order = MapFromRequest(request);
-            var orders = _orleansClient.GetGrain<IOrders>(Guid.Empty);
-            var result = await orders.Add(order);
+            var result = await _orleansClient.GetGrain<IOrders>(Guid.Empty).Add(order);
             var response = MapToViewModel(result);
             return response;
         }
@@ -73,33 +84,40 @@ namespace WebApi.Controllers
 
     public static class OrdersMapper
     {
-        public static Order MapFromRequest(OrderCreateRequest request)
+        public static GrainInterfaces.Orders.OrderCreateRequest MapFromRequest(Models.Orders.OrderCreateRequest request)
         {
-            return new Order
+            return new GrainInterfaces.Orders.OrderCreateRequest
             {
                 Items = request.Items.Select(x => MapFromRequest(x)).ToList(),
                 Name = request.Name,
             };
         }
 
-        public static OrderItem MapFromRequest(OrderCreateItemRequest request)
+        public static OrderItemCreateRequest MapFromRequest(OrderCreateItemRequest request)
         {
-            return new OrderItem
+            return new OrderItemCreateRequest
             {
                 ProductId = request.ProductId,
                 Quantity = request.Quantity
             };
         }
 
-        public static OrderViewModel MapToViewModel(Order item)
+        public static OrderViewModel MapToViewModel(OrderState item)
         {
             return new OrderViewModel(item);
         }
 
-        public static OrdersViewModel MapToViewModel(IEnumerable<Order> items)
+        public static OrdersViewModel MapToViewModel(IEnumerable<OrderState> items)
         {
             var result = new OrdersViewModel();
             result.Orders = items.Select(x => new OrderViewModel(x)).ToList();
+            return result;
+        }
+
+        public static OrderEventsViewModel MapToViewModel(IEnumerable<OrderEventInfo> items)
+        {
+            var result = new OrderEventsViewModel();
+            result.Events = items.Select(x => new OrderEventViewModel(x)).ToList();
             return result;
         }
     }

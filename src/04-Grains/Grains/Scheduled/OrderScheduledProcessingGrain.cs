@@ -45,9 +45,8 @@ namespace OrleansSilo.Scheduled
         {
             _logger.Info($"Reminder {reminderName} received a reminder");
 
-            var tasks = new List<Task<Order>>();
-            var g = GrainFactory.GetGrain<IOrders>(Guid.Empty);
-            var orders = await g.GetAllNotDispatched();
+            var tasks = new List<Task<OrderState>>();
+            var orders = await GrainFactory.GetGrain<IOrders>(Guid.Empty).GetNotDispatched();
 
             var i = 0;
             foreach (var orderGuid in orders)
@@ -55,9 +54,8 @@ namespace OrleansSilo.Scheduled
                 i++;
                 _logger.Info($"Order try-to-dispatch required for order {orderGuid} {i}/{orders.Length}");
 
-                var go = GrainFactory.GetGrain<IOrder>(orderGuid);
-                var tryTask = go.TryDispatch(false);
-                tasks.Add(tryTask);
+                var task = GrainFactory.GetGrain<IOrder>(orderGuid).TryDispatch(false);
+                tasks.Add(task);
             }
             await Task.WhenAll(tasks);
 

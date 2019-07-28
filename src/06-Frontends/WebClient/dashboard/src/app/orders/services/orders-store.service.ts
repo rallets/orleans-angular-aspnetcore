@@ -6,6 +6,7 @@ import { NotificationStoreService } from 'src/app/shared/services/notification-s
 import { handleHttpError } from 'src/app/shared/helpers/http/http-error.helpers';
 import { NotificationLevel } from 'src/app/shared/models/notification.model';
 import { delay } from 'src/app/shared/dialogs/delay.helper';
+import { guid } from 'src/app/shared/types/guid.type';
 
 @Injectable({
 	providedIn: 'root'
@@ -39,6 +40,19 @@ export class OrdersStoreService implements OnDestroy {
 		}, error => {
 			handleHttpError(error, this.notification);
 			this._orders.next([]);
+		});
+	}
+
+	getOrderEvents(orderGuid: guid) {
+		const items = this.backend.getOrderEvents(orderGuid);
+		items.subscribe(result => {
+			const orders = this._orders.getValue();
+			const idx = orders.findIndex(x => x.id === orderGuid);
+			orders[idx].events = result.events;
+			this._orders.next(orders);
+		}, error => {
+			handleHttpError(error, this.notification);
+			// this._events.next([]);
 		});
 	}
 

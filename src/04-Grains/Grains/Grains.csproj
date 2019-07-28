@@ -11,6 +11,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.3.5" />
+    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="2.3.5" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.3.5" />
   </ItemGroup>
 

@@ -9,11 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Orleans.EventSourcing;
 
 namespace OrleansSilo.Orders
 {
-    [StorageProvider(ProviderName = "TableStore")]
-    public class OrderGrain : Grain<Order>, IOrder
+    [LogConsistencyProvider(ProviderName = "LogStorage")]
+    [StorageProvider(ProviderName = "BlobStore")]
+    public class OrderGrain : JournaledGrain<OrderState, OrderEvent>, IOrder
     {
         private readonly ILogger _logger;
 
@@ -22,39 +24,44 @@ namespace OrleansSilo.Orders
             _logger = logger;
         }
 
-        public async Task<Order> Create(Order order)
+        public async Task<OrderState> Create(OrderCreateRequest order)
         {
-            var products = await GetProductsAsync(order.Items);
+            var products = await GetProductsAsync(order.Items.Select(x => x.ProductId).Distinct().ToList());
             foreach (var item in order.Items)
             {
                 item.Product = products.FirstOrDefault(p => p.Id == item.ProductId);
             }
             order.TotalAmount = order.Items.Sum(item => item.Quantity * item.Product.Price);
 
-            State = order;
-            await base.WriteStateAsync();
+            RaiseEvent(new OrderCreatedEvent(order));
+            await ConfirmEvents();
             return State;
         }
 
-        public async Task<Order> TryDispatch(bool isNewOrder)
+        public async Task<OrderState> TryDispatch(bool isNewOrder)
         {
             _logger.Info($"Order try to dispatch - Id: {State.Id} New: {isNewOrder}");
 
             var gis = GrainFactory.GetGrain<IInventories>(Guid.Empty);
 
-            if (!await gis.Exists(State.AssignedInventory))
+            if (State.AssignedInventoryId.HasValue && !await gis.Exists(State.AssignedInventoryId.Value))
             {
-                State.AssignedInventory = Guid.Empty;
+                RaiseEvent(new OrderInventoryUnassignedEvent { Date = DateTimeOffset.Now });
+                await ConfirmEvents();
             }
 
-            if (State.AssignedInventory == Guid.Empty)
+            if (!State.AssignedInventoryId.HasValue)
             {
                 // find best inventory and store it, booked quantity is for inventory
-                var inventoryGuid = await gis.GetBestForProduct(State.Items.First().ProductId);
-                State.AssignedInventory = inventoryGuid;
+                var inventoryId = await gis.GetBestForProduct(State.Items.First().ProductId);
+                RaiseEvent(new OrderInventoryAssignedEvent {
+                    Date = DateTimeOffset.Now,
+                    InventoryId = inventoryId
+                });
+                await ConfirmEvents();
             }
 
-            var gi = GrainFactory.GetGrain<IInventory>(State.AssignedInventory);
+            var gi = GrainFactory.GetGrain<IInventory>(State.AssignedInventoryId.Value);
 
             // try to dispatch all items, otherwise set order as "not processable"
             var isOrderProcessable = true;
@@ -64,7 +71,7 @@ namespace OrleansSilo.Orders
                 {
                     var produckStockRemaining = await gi.Deduct(item.ProductId, item.Quantity);
                     var isItemProcessable = (produckStockRemaining >= 0);
-                    if(!isItemProcessable)
+                    if (!isItemProcessable)
                     {
                         // TODO: send event for non-processable order item
                     }
@@ -95,35 +102,51 @@ namespace OrleansSilo.Orders
                 // TODO: send event for processable order
             }
 
-            State.Dispatched = isOrderProcessable;
+            if (isOrderProcessable)
+            {
+                RaiseEvent(new OrderDispatchedEvent {
+                    Date = DateTimeOffset.Now
+                });
+                await ConfirmEvents();
 
-            if (State.Dispatched)
+                 _logger.Info($"Order {State.Id} set as dispatched");
+                 var gorders = GrainFactory.GetGrain<IOrders>(Guid.Empty);
+                 await gorders.SetAsDispatched(State.Id);
+            }
+            else
             {
-                _logger.Info($"Order {State.Id} set as dispatched");
-                var gorders = GrainFactory.GetGrain<IOrders>(Guid.Empty);
-                await gorders.SetAsDispatched(State.Id);
-            } else
-            {
+                RaiseEvent(new OrderNotProcessableEvent {
+                    Date = DateTimeOffset.Now
+                });
+                await ConfirmEvents();
+
                 _logger.Info($"Order not processable - Id: {State.Id} New: {isNewOrder}");
             }
-            await base.WriteStateAsync();
             return State;
         }
 
-        private async Task<Product[]> GetProductsAsync(List<OrderItem> items)
+        private async Task<Product[]> GetProductsAsync(List<Guid> items)
         {
             var products = new List<Task<Product>>();
             foreach (var item in items)
             {
-                var product = GrainFactory.GetGrain<IProduct>(item.ProductId);
-                products.Add(product.GetState());
+                var task = GrainFactory.GetGrain<IProduct>(item).GetState();
+                products.Add(task);
             }
             return await Task.WhenAll(products);
         }
 
-        public Task<Order> GetState()
+        public Task<OrderState> GetState()
         {
             return Task.FromResult(this.State);
         }
+
+        public async Task<List<OrderEventInfo>> GetEvents()
+        {
+            var events = await RetrieveConfirmedEvents(0, Version);
+            var result = events.Select(x => new OrderEventInfo(x as OrderEvent)).ToList();
+            return result;
+        }
     }
+
 }

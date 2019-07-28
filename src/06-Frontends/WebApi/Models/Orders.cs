@@ -13,14 +13,14 @@ namespace WebApi.Models.Orders
 
     public class OrderViewModel
     {
-        public OrderViewModel(Order order)
+        public OrderViewModel(OrderState order)
         {
             Id = order.Id;
-            Dispatched = order.Dispatched;
+            Dispatched = order.DispatchedDate.HasValue;
             Name = order.Name;
             Date = order.Date;
             TotalAmount = order.TotalAmount;
-            order.Items = order.Items ?? new List<OrderItem>();
+            order.Items = order.Items ?? new List<OrderStateItem>();
             Items = order.Items?.Select(x => new OrderItemViewModel(x)).ToList();
         }
 
@@ -34,7 +34,7 @@ namespace WebApi.Models.Orders
 
     public class OrderItemViewModel
     {
-        public OrderItemViewModel(OrderItem item)
+        public OrderItemViewModel(OrderStateItem item)
         {
             Product = new OrderItemProductViewModel(item.Product);
             Quantity = item.Quantity;
@@ -85,5 +85,22 @@ namespace WebApi.Models.Orders
 
         public int All;
         public int NotDispatched;
+    }
+
+    public class OrderEventsViewModel
+    {
+        public List<OrderEventViewModel> Events;
+    }
+
+    public class OrderEventViewModel
+    {
+        public OrderEventViewModel(OrderEventInfo info)
+        {
+            Name = info.Name;
+            Date = info.Date;
+        }
+
+        public string Name;
+        public DateTimeOffset Date;
     }
 }
