@@ -13,15 +13,15 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="2.3.5" />
-    <PackageReference Include="Microsoft.Orleans.OrleansProviders" Version="2.3.5" />
-    <PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.Counters" Version="2.3.5" />
-    <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="2.3.5" />
-    <PackageReference Include="Microsoft.Orleans.ProtobufNet" Version="2.3.5" />
-    <PackageReference Include="Microsoft.Orleans.Reminders.AzureStorage" Version="2.3.5" />
-    <PackageReference Include="Microsoft.Orleans.Server" Version="2.3.5" />
-    <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="2.3.5" />
-    <PackageReference Include="OrleansDashboard" Version="2.3.5" />
+    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.OrleansProviders" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.Counters" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.ProtobufNet" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Reminders.AzureStorage" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="2.3.6" />
+    <PackageReference Include="OrleansDashboard" Version="2.3.6" />
   </ItemGroup>
 
   <ItemGroup>
