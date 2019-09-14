@@ -17,6 +17,7 @@ namespace GrainInterfaces.Orders
     [Serializable]
     public class OrderCreatedEvent : OrderEvent
     {
+        public OrderCreatedEvent() { }
         public OrderCreatedEvent(OrderCreateRequest order)
         {
             Date = order.Date;
@@ -62,6 +63,7 @@ namespace GrainInterfaces.Orders
     [Serializable]
     public class OrderEventInfo
     {
+        public OrderEventInfo() { }
         public OrderEventInfo(OrderEvent @event)
         {
             Name = @event.GetType().Name;
