@@ -27,15 +27,17 @@ namespace OrleansSilo.Inventories
             _logger = logger;
         }
 
-        public async Task<Inventory[]> GetAll()
+        public Task<Guid[]> GetAll()
         {
-            var inventories = new List<Task<Inventory>>();
-            foreach (var kvp in this.State.Inventories)
-            {
-                var inventory = GrainFactory.GetGrain<IInventory>(kvp.Key);
-                inventories.Add(inventory.GetState());
-            }
-            return await Task.WhenAll(inventories);
+            var ids = this.State.Inventories.Select(x => x.Key).ToArray();
+            return Task.FromResult(ids);
+            //var inventories = new List<Task<Inventory>>();
+            //foreach (var kvp in this.State.Inventories)
+            //{
+            //    var inventory = GrainFactory.GetGrain<IInventory>(kvp.Key);
+            //    inventories.Add(inventory.GetState());
+            //}
+            //return await Task.WhenAll(inventories);
         }
 
         public async Task<Guid> GetBestForProduct(Guid productGuid)
@@ -66,7 +68,8 @@ namespace OrleansSilo.Inventories
             data.Id = Guid.NewGuid();
             data.CreationDate = DateTimeOffset.Now;
             var inventory = GrainFactory.GetGrain<IInventory>(data.Id);
-            var result = await inventory.Create(data);
+            await inventory.Create(data);
+            var result = await inventory.GetState();
             State.Inventories.Add(data.Id, data.WarehouseCode);
             _logger.LogInformation($"Inventory created => {data.Id} {data.WarehouseCode}");
             await base.WriteStateAsync();
@@ -87,7 +90,7 @@ namespace OrleansSilo.Inventories
             return Task.FromResult(result);
         }
 
-        public async Task<Inventory> GetFromWarehouse(Guid warehouseGuid)
+        public async Task<Inventory> GetByWarehouse(Guid warehouseGuid)
         {
             var id = State.Inventories.First(x => x.Value == warehouseGuid).Key;
             var g = GrainFactory.GetGrain<IInventory>(id);

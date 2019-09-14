@@ -7,52 +7,6 @@ using System.Linq;
 
 namespace GrainInterfaces.Orders
 {
-    public abstract class OrderEvent
-    {
-        public DateTimeOffset Date { get; set; }
-    }
-
-    public class OrderCreatedEvent : OrderEvent
-    {
-        public OrderCreatedEvent(OrderCreateRequest order)
-        {
-            Date = order.Date;
-            Id = order.Id;
-            Name = order.Name;
-            TotalAmount = order.TotalAmount;
-            Items = order.Items.Select(x => new OrderStateItem(x)).ToList();
-        }
-
-        public Guid Id;
-        public string Name;
-        public decimal TotalAmount;
-        public List<OrderStateItem> Items;
-        public Guid? AssignedInventory = null;
-    }
-
-    public class OrderDispatchedEvent : OrderEvent { }
-
-    public class OrderInventoryAssignedEvent : OrderEvent
-    {
-        public Guid InventoryId;
-    }
-
-    public class OrderInventoryUnassignedEvent : OrderEvent { }
-    public class OrderNotProcessableEvent : OrderEvent { }
-
-    public class OrderEventInfo
-    {
-        public OrderEventInfo(OrderEvent @event)
-        {
-            Name = @event.GetType().Name;
-            Date = @event.Date;
-        }
-
-        public string Name;
-        public DateTimeOffset Date;
-        public string Description;
-    }
-
     [ProtoContract]
     [Serializable]
     public class OrderState

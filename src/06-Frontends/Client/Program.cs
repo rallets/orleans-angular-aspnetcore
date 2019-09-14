@@ -124,7 +124,6 @@ namespace OrleansSilo
 
             await Test_Orders.GetOrdersStatsCache(client);
 
-            // await Test_Orders.WaitForAllDispatched(client);
             var orders = await Test_Orders.GetAll(client);
             if (orders.Length < numOrders)
             {

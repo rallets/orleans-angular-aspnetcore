@@ -12,11 +12,6 @@ using System.Threading.Tasks;
 
 namespace OrleansSilo.Warehouses
 {
-    public class WarehousesState
-    {
-        public List<Guid> Warehouses = new List<Guid>();
-    }
-
     [StorageProvider(ProviderName = "BlobStore")]
     public class WarehousesGrain : Grain<WarehousesState>, IWarehouses
     {
@@ -27,7 +22,7 @@ namespace OrleansSilo.Warehouses
             _logger = logger;
         }
 
-        async Task<Warehouse[]> IWarehouses.GetAll()
+        public async Task<Warehouse[]> GetAll()
         {
             var warehouses = new List<Task<Warehouse>>();
 
@@ -40,7 +35,7 @@ namespace OrleansSilo.Warehouses
             return await Task.WhenAll(warehouses);
         }
 
-        async Task<Warehouse> IWarehouses.Add(Warehouse info)
+        public async Task<Warehouse> Add(Warehouse info)
         {
             info.Id = Guid.NewGuid();
             info.CreationDate = DateTimeOffset.Now;
@@ -59,6 +54,7 @@ namespace OrleansSilo.Warehouses
                 CurrentStockQuantity = 0,
                 SafetyStockQuantity = 10, // TODO: should this come from the Product ?
             });
+
             var inventory = new Inventory
             {
                 Id = Guid.NewGuid(),
@@ -68,13 +64,13 @@ namespace OrleansSilo.Warehouses
             };
 
             var gi = GrainFactory.GetGrain<IInventories>(Guid.Empty);
-            var inventories = await gi.Add(inventory);
+            await gi.Add(inventory);
 
             await base.WriteStateAsync();
             return result;
         }
 
-        Task<bool> IWarehouses.Exists(Guid id)
+        public Task<bool> Exists(Guid id)
         {
             var result = State.Warehouses.Contains(id);
             _logger.LogInformation($"Warehouse exists {id} => {result}");

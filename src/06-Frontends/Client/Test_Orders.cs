@@ -83,6 +83,11 @@ namespace TestClient
             }
 
             var products = await Test_Products.GetAll(client);
+            if(products.Any(x => x.Id == Guid.Empty))
+            {
+                Console.WriteLine($"Invalid empty GUID per products");
+            }
+
             var product = products.OrderBy(x => Guid.NewGuid()).First();
 
             var g = client.GetGrain<IOrders>(Guid.Empty);
@@ -99,7 +104,8 @@ namespace TestClient
                 },
                 Name = $"Test order {name}",
             });
-            Console.WriteLine($"Added order {name} {response.Id}");
+            var productIDs = string.Join(",", response.Items.Select(x => x.ProductId).ToArray());
+            Console.WriteLine($"Added order {name} {response.Id} with productIDs {productIDs}");
             return response.Id;
         }
 

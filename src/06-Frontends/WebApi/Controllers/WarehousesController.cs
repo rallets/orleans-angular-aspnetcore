@@ -56,7 +56,7 @@ namespace WebApi.Controllers
                 return NotFound();
             }
 
-            var inventoryTask = gi.GetFromWarehouse(warehouseGuid);
+            var inventoryTask = gi.GetByWarehouse(warehouseGuid);
 
             var gp = _orleansClient.GetGrain<IProducts>(Guid.Empty);
             var productsTask = gp.GetAll();

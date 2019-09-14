@@ -43,14 +43,14 @@ namespace OrleansSilo.Scheduled
         {
             _logger.Info($"Reminder {reminderName} received a reminder");
 
-            var tasks = new List<Task<decimal>>();
             // TODO: maybe inventory can just expose a list of products that need to be replenished
             var inventories = await GrainFactory.GetGrain<IInventories>(Guid.Empty).GetAll();
-            foreach (var inventory in inventories)
+            foreach (var inventoryGuid in inventories)
             {
-                IInventory gi = null;
+                IInventory gi = GrainFactory.GetGrain<IInventory>(inventoryGuid);
+                var state = await gi.GetState();
 
-                foreach (var stock in inventory.ProductsStocks)
+                foreach (var stock in state.ProductsStocks)
                 {
                     var qty = stock.Value.SupplyingRequiredQuantity;
                     if (qty > 0)
@@ -59,16 +59,11 @@ namespace OrleansSilo.Scheduled
 
                         _logger.Info($"Inventory increase required for product {productGuid} for {qty} (safety stock {stock.Value.SafetyStockQuantity} + already booked {stock.Value.BookedQuantity} - currently in stock {stock.Value.CurrentStockQuantity})");
 
-                        if (gi == null)
-                        {
-                            gi = GrainFactory.GetGrain<IInventory>(inventory.Id);
-                        }
-                        var increaseTask = gi.Increase(productGuid, qty);
-                        tasks.Add(increaseTask);
+                        await gi.Increase(productGuid, qty);
+                        var currentStockRemaining = (await gi.GetProductState(productGuid)).CurrentStockQuantity;
                     }
                 }
             }
-            await Task.WhenAll(tasks);
 
             _logger.Info($"Reminder {reminderName} completed");
         }

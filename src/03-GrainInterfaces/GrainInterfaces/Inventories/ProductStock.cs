@@ -3,29 +3,6 @@ using System;
 
 namespace GrainInterfaces.Inventories
 {
-    public enum StockState
-    {
-        /// <summary>
-        /// An unknown state, it cannot happen (assertion error)
-        /// </summary>
-        Unknown = 0,
-
-        /// <summary>
-        /// Current stock quantity greather than 0 (order can be processed)
-        /// </summary>
-        Available,
-
-        /// <summary>
-        /// Current stock quantity less than 0 (order cannot be processed)
-        /// </summary>
-        Unavailable,
-
-        /// <summary>
-        /// No longer active, it cannot be used or processed
-        /// </summary>
-        OutOfStock
-    }
-
     [ProtoContract]
     [Serializable]
     public class ProductStock
@@ -38,7 +15,7 @@ namespace GrainInterfaces.Inventories
         public decimal BookedQuantity;
         [ProtoMember(4)]
         public bool Active;
-        // [ProtoMember(5), DefaultValue(StockState.Unknown)]
+
         public StockState State
         {
             get
@@ -51,7 +28,7 @@ namespace GrainInterfaces.Inventories
                 {
                     return StockState.Available;
                 }
-                else // if(CurrentStockQuantity <= 0)
+                else
                 {
                     return StockState.Unavailable;
                 }
@@ -67,7 +44,7 @@ namespace GrainInterfaces.Inventories
                     return 0;
                 }
                 if (BookedQuantity > 0) {
-                    return SafetyStockQuantity + BookedQuantity;
+                    return (SafetyStockQuantity - CurrentStockQuantity) + BookedQuantity;
                 }
                 if(CurrentStockQuantity < SafetyStockQuantity)
                 {

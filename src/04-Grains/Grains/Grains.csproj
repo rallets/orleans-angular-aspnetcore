@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.3.6" />
     <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="2.3.6" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Transactions" Version="2.3.6" />
   </ItemGroup>
 
   <ItemGroup>

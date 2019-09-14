@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Orleans;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,17 +7,22 @@ namespace GrainInterfaces.Inventories
 {
     public interface IInventory : Orleans.IGrainWithGuidKey
     {
-        Task<Inventory> Create(Inventory inventory);
-        Task<Inventory> GetState();
-        Task AddProduct(Guid productGuid);
-        Task<ProductStock> GetProductState(Guid productGuid);
-        Task<decimal> Increase(Guid productGuid, decimal quantity);
-        Task<decimal> Deduct(Guid productGuid, decimal quantity);
-    }
+        [Transaction(TransactionOption.CreateOrJoin)]
+        Task Create(Inventory inventory);
 
-    public interface IInventoryQueryable : Orleans.IGrainWithGuidKey
-    {
-        Task<Dictionary<Guid, StockState>> GetAvailable();
-        Task<Dictionary<Guid, StockState>> GetInSafetyStockQuantity();
+        [Transaction(TransactionOption.CreateOrJoin)]
+        Task<Inventory> GetState();
+
+        [Transaction(TransactionOption.CreateOrJoin)]
+        Task AddProduct(Guid productGuid);
+
+        [Transaction(TransactionOption.CreateOrJoin)]
+        Task<ProductStock> GetProductState(Guid productGuid);
+
+        [Transaction(TransactionOption.CreateOrJoin)]
+        Task Increase(Guid productGuid, decimal quantity);
+
+        [Transaction(TransactionOption.CreateOrJoin)]
+        Task Deduct(Guid productGuid, decimal quantity);
     }
 }

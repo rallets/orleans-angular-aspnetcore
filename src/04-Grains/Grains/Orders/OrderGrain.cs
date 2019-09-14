@@ -67,10 +67,17 @@ namespace OrleansSilo.Orders
             var isOrderProcessable = true;
             foreach (var item in State.Items)
             {
+                if(item.ProductId == Guid.Empty)
+                {
+                    string e = "Invalid guid";
+                }
+
                 if (isNewOrder)
                 {
-                    var produckStockRemaining = await gi.Deduct(item.ProductId, item.Quantity);
-                    var isItemProcessable = (produckStockRemaining >= 0);
+                    await gi.Deduct(item.ProductId, item.Quantity);
+                    // var produckStockRemaining = await gi.Deduct(item.ProductId, item.Quantity);
+                    var produckStockRemaining = (await gi.GetProductState(item.ProductId)).CurrentStockQuantity;
+                    var isItemProcessable = (produckStockRemaining >= item.Quantity);
                     if (!isItemProcessable)
                     {
                         // TODO: send event for non-processable order item
@@ -91,7 +98,9 @@ namespace OrleansSilo.Orders
             {
                 foreach (var item in State.Items)
                 {
-                    var produckStockRemaining = await gi.Deduct(item.ProductId, item.Quantity);
+                    // var produckStockRemaining = await gi.Deduct(item.ProductId, item.Quantity);
+                    await gi.Deduct(item.ProductId, item.Quantity);
+                    var produckStockRemaining = (await gi.GetProductState(item.ProductId)).CurrentStockQuantity;
                     var isItemProcessable = (produckStockRemaining >= 0);
                     isOrderProcessable &= isItemProcessable;
                 }

@@ -3,6 +3,7 @@ using GrainInterfaces.Warehouses;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Providers;
+using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,14 +20,16 @@ namespace OrleansSilo.Warehouses
             _logger = logger;
         }
 
-        async Task<Warehouse> IWarehouse.Create(Warehouse Warehouse)
+        public async Task<Warehouse> Create(Warehouse warehouse)
         {
-            State = Warehouse;
+            State = warehouse;
             await base.WriteStateAsync();
+
+            _logger.Info($"{nameof(Warehouse)} created => {warehouse.Id}");
             return State;
         }
 
-        Task<Warehouse> IWarehouse.GetState()
+        public Task<Warehouse> GetState()
         {
             return Task.FromResult(State);
         }

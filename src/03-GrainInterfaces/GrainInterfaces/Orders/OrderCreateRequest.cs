@@ -21,7 +21,6 @@ namespace GrainInterfaces.Orders
         public List<OrderItemCreateRequest> Items;
         [ProtoMember(6)]
         public Guid? AssignedInventory;
-
     }
 
     [ProtoContract]

@@ -21,6 +21,8 @@
     <PackageReference Include="Microsoft.Orleans.Reminders.AzureStorage" Version="2.3.6" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="2.3.6" />
     <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Transactions" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Transactions.AzureStorage" Version="2.3.6" />
     <PackageReference Include="OrleansDashboard" Version="2.3.6" />
   </ItemGroup>
 

@@ -12,11 +12,6 @@ using System.Threading.Tasks;
 
 namespace OrleansSilo.Products
 {
-    public class ProductsState
-    {
-        public List<Guid> Products = new List<Guid>();
-    }
-
     [StorageProvider(ProviderName = "BlobStore")]
     [ImplicitStreamSubscription("ProductCreatedStream")]
     public class ProductsGrain : Grain<ProductsState>, IProducts
@@ -53,29 +48,6 @@ namespace OrleansSilo.Products
             }
             return await Task.WhenAll(products);
         }
-
-        //public async Task<Product> Add(Product info)
-        //{
-        //    info.Id = Guid.NewGuid();
-        //    info.CreationDate = DateTimeOffset.Now;
-
-        //    var g = GrainFactory.GetGrain<IProduct>(info.Id);
-        //    var product = await g.Create(info);
-        //    State.Products.Add(info.Id);
-        //    _logger.Info($"Product created => {info.Id}");
-
-        //    // add the product in all inventories
-        //    var gi = GrainFactory.GetGrain<IInventories>(Guid.Empty);
-        //    var inventories = await gi.GetAll();
-        //    foreach (var inventory in inventories)
-        //    {
-        //        var gx = GrainFactory.GetGrain<IInventory>(inventory.Id);
-        //        await gx.AddProduct(info.Id);
-        //    }
-
-        //    await base.WriteStateAsync();
-        //    return product;
-        //}
 
         public Task<bool> Exists(Guid id)
         {

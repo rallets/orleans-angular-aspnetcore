@@ -6,108 +6,143 @@ using Orleans.Providers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Orleans.Transactions.Abstractions;
+using Orleans.Concurrency;
 
 namespace OrleansSilo.Inventories
 {
     [StorageProvider(ProviderName = "BlobStore")]
-    class InventoryGrain : Grain<Inventory>, IInventory
+    class InventoryGrain : Grain, IInventory
     {
         private readonly ILogger _logger;
+        private readonly ITransactionalState<Inventory> inventory;
 
-        public InventoryGrain(ILogger<InventoryGrain> logger)
+        public InventoryGrain(
+            ILogger<InventoryGrain> logger,
+            [TransactionalState("inventory", "TransactionStore")]
+            ITransactionalState<Inventory> inventory
+            )
         {
             _logger = logger;
+            this.inventory = inventory ?? throw new ArgumentNullException(nameof(inventory));
         }
 
         private Guid GrainKey => this.GetPrimaryKey();
 
-        async Task<Inventory> IInventory.Create(Inventory data)
+        [AlwaysInterleave]
+        public Task Create(Inventory data)
         {
-            State = data;
-            await base.WriteStateAsync();
-            return State;
-        }
-
-        async Task IInventory.AddProduct(Guid productGuid)
-        {
-            var exists = State.ProductsStocks.Any(x => x.Key == productGuid);
-            if(exists)
+            return this.inventory.PerformUpdate(state =>
             {
-                return;
-            }
-
-            State.ProductsStocks.Add(productGuid, new ProductStock
-            {
-                CurrentStockQuantity = 0,
-                SafetyStockQuantity = 10, // TODO: should this come from the Product ?
-                BookedQuantity = 0,
-                Active = true
+                state.CreationDate = data.CreationDate;
+                state.Id = data.Id;
+                state.ProductsStocks = data.ProductsStocks;
+                state.WarehouseCode = data.WarehouseCode;
+                return state;
             });
-            
-            await base.WriteStateAsync();
         }
 
-        Task<ProductStock> IInventory.GetProductState(Guid ProductGuid)
+        [AlwaysInterleave]
+        public Task AddProduct(Guid productGuid)
         {
-            var stockState = State.ProductsStocks.FirstOrDefault(x => x.Key == ProductGuid).Value;
-            return Task.FromResult(stockState);
-        }
-
-        async Task<decimal> IInventory.Increase(Guid productGuid, decimal quantity)
-        {
-            var productStock = State.ProductsStocks.First(x => x.Key == productGuid).Value;
-
-            var currentStockQuantity = productStock.CurrentStockQuantity;
-            var bookedQuantity = productStock.BookedQuantity;
-
-            if (bookedQuantity > 0)
+            return this.inventory.PerformUpdate(state =>
             {
-                if (quantity >= bookedQuantity)
+                var exists = state.ProductsStocks.Any(x => x.Key == productGuid);
+                _logger.Info($"Inventory {GrainKey} - Add Product {productGuid} - Exists: {exists}");
+                if (exists)
                 {
-                    productStock.CurrentStockQuantity += quantity;
-                    productStock.BookedQuantity = 0;
-                } else
-                {
-                    productStock.CurrentStockQuantity += quantity;
-                    productStock.BookedQuantity -= quantity;
+                    return state;
                 }
-            }
-            else
-            {
-                productStock.CurrentStockQuantity += quantity;
-            }
-            _logger.Info($"Inventory {GrainKey} - Product {productGuid} increased from {currentStockQuantity}/{bookedQuantity} to {productStock.CurrentStockQuantity}/{productStock.BookedQuantity}");
-            await base.WriteStateAsync();
-            return productStock.CurrentStockQuantity;
+
+                state.ProductsStocks.Add(productGuid, new ProductStock
+                {
+                    CurrentStockQuantity = 0,
+                    SafetyStockQuantity = 10, // TODO: should this come from the Product ?
+                    BookedQuantity = 0,
+                    Active = true
+                });
+                return state;
+            });
         }
 
-        async Task<decimal> IInventory.Deduct(Guid productGuid, decimal quantity)
+        [AlwaysInterleave]
+        public Task<ProductStock> GetProductState(Guid ProductGuid)
         {
-            var productStock = State.ProductsStocks.First(x => x.Key == productGuid).Value;
-            var currentStockQuantity = productStock.CurrentStockQuantity;
-            var bookedQuantity = productStock.BookedQuantity;
-
-            if (currentStockQuantity >= quantity)
+            return this.inventory.PerformRead(state =>
             {
-                // order can be dispatched
-                productStock.CurrentStockQuantity -= quantity;
-                _logger.Info($"Inventory {GrainKey} - Product {productGuid} deducted from {currentStockQuantity}/{bookedQuantity} to {productStock.CurrentStockQuantity}/{productStock.BookedQuantity}");
-                await base.WriteStateAsync();
-                return productStock.CurrentStockQuantity;
-            }
-
-            // order cannot be dispatched, add in the booked queue
-            productStock.BookedQuantity += quantity;
-
-            _logger.Info($"Inventory {GrainKey} - Product {productGuid} deducted from {currentStockQuantity}/{bookedQuantity} to {productStock.CurrentStockQuantity}/{productStock.BookedQuantity}");
-
-            await base.WriteStateAsync();
-            return -productStock.BookedQuantity;
+                var stockState = state.ProductsStocks.FirstOrDefault(x => x.Key == ProductGuid).Value;
+                return stockState;
+            });
         }
 
-        Task<Inventory> IInventory.GetState()
+        [AlwaysInterleave]
+        public Task Increase(Guid productGuid, decimal quantity)
         {
-            return Task.FromResult(this.State);
+            return this.inventory.PerformUpdate(state =>
+            {
+                var productStock = state.ProductsStocks.First(x => x.Key == productGuid).Value;
+
+                var currentStockQuantity = productStock.CurrentStockQuantity;
+                var bookedQuantity = productStock.BookedQuantity;
+
+                if (bookedQuantity > 0)
+                {
+                    if (quantity >= bookedQuantity)
+                    {
+                        productStock.CurrentStockQuantity += quantity;
+                        productStock.BookedQuantity = 0;
+                    }
+                    else
+                    {
+                        productStock.CurrentStockQuantity += quantity;
+                        productStock.BookedQuantity -= quantity;
+                    }
+                }
+                else
+                {
+                    productStock.CurrentStockQuantity += quantity;
+                }
+
+                state.ProductsStocks.First(x => x.Key == productGuid).Value.CurrentStockQuantity = productStock.CurrentStockQuantity;
+                state.ProductsStocks.First(x => x.Key == productGuid).Value.BookedQuantity = productStock.BookedQuantity;
+
+                _logger.Info($"Inventory {GrainKey} - Product {productGuid} increased from {currentStockQuantity}/{bookedQuantity} to {productStock.CurrentStockQuantity}/{productStock.BookedQuantity}");
+
+                return state;
+            });
+        }
+
+        [AlwaysInterleave]
+        public Task Deduct(Guid productGuid, decimal quantity)
+        {
+            return this.inventory.PerformUpdate(state =>
+            {
+                var productStock = state.ProductsStocks.First(x => x.Key == productGuid).Value;
+                var currentStockQuantity = productStock.CurrentStockQuantity;
+                var bookedQuantity = productStock.BookedQuantity;
+
+                if (currentStockQuantity >= quantity)
+                {
+                    // order can be dispatched
+                    state.ProductsStocks.First(x => x.Key == productGuid).Value.CurrentStockQuantity -= quantity;
+                    _logger.Info($"Inventory {GrainKey} - Product {productGuid} deducted CurrentStock {currentStockQuantity} of {quantity}");
+                    return state;
+                }
+
+                // order cannot be dispatched, add in the booked queue
+                state.ProductsStocks.First(x => x.Key == productGuid).Value.BookedQuantity += quantity;
+                _logger.Info($"Inventory {GrainKey} - Product {productGuid} increased BookedQuantity {bookedQuantity} of {quantity}");
+                return state;
+            });
+        }
+
+        [AlwaysInterleave]
+        public Task<Inventory> GetState()
+        {
+            return this.inventory.PerformRead(state =>
+            {
+                return state;
+            });
         }
 
     }

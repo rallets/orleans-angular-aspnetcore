@@ -1,10 +1,7 @@
-﻿using GrainInterfaces.Inventories;
-using GrainInterfaces.Models;
-using GrainInterfaces.Orders;
+﻿using GrainInterfaces.Orders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans;
-using Orleans.Concurrency;
 using Orleans.Configuration;
 using Orleans.Providers;
 using System;
@@ -14,18 +11,12 @@ using System.Threading.Tasks;
 
 namespace OrleansSilo.Orders
 {
-    public class OrdersState
-    {
-        public List<Guid> Orders = new List<Guid>();
-        public List<Guid> OrdersNotDispatched = new List<Guid>(); // TODO: can state be splitted in 2 interfaces to reduce lock surface?
-    }
-
     [StorageProvider(ProviderName = "BlobStore")]
     public class OrdersGrain : Grain<OrdersState>, IOrders
     {
         private readonly ILogger _logger;
 
-        public OrdersGrain(ILogger<OrdersGrain> logger, IOptions<SiloMessagingOptions> messagingOptions)
+        public OrdersGrain(ILogger<OrdersGrain> logger)
         {
             _logger = logger;
         }
@@ -58,7 +49,6 @@ namespace OrleansSilo.Orders
             return await Task.WhenAll(orders);
         }
 
-        // [AlwaysInterleave]
         public Task<Guid[]> GetNotDispatched()
         {
             return Task.FromResult(this.State.OrdersNotDispatched.ToArray());
@@ -77,11 +67,16 @@ namespace OrleansSilo.Orders
 
         public async Task<OrderState> Add(OrderCreateRequest info)
         {
+            if(info.Items.Any(x => x.ProductId == Guid.Empty))
+            {
+                string e = "Invalid empty guid";
+            }
+
             info.Id = Guid.NewGuid();
             info.Date = DateTimeOffset.Now;
             var g = GrainFactory.GetGrain<IOrder>(info.Id);
             var order = await g.Create(info);
-            _logger.LogInformation($"Order created => Id: {order.Id} Name: {order.Name} Dispatched: {order.DispatchedDate}");
+            _logger.LogInformation($"Order created => Id: {order.Id} Name: {order.Name}");
 
             State.OrdersNotDispatched.Add(order.Id);
             State.Orders.Add(order.Id);
@@ -106,7 +101,7 @@ namespace OrleansSilo.Orders
 
             // update the stats state
             var value = new OrdersStats { Orders = orders, OrdersNotDispatched = ordersNotDipatched };
-            _logger.LogInformation("{@GrainType} {@GrainKey} updating value to {@Value}", GrainType, GrainKey, value); // TODO: check logs
+            _logger.LogInformation("{@GrainType} {@GrainKey} updating value to {@Value}", GrainType, GrainKey, value);
 
             await GrainFactory.GetGrain<IOrdersStatsProducer>(Guid.Empty).UpdateValue(value);
         }

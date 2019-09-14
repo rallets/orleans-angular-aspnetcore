@@ -31,7 +31,7 @@ namespace OrleansSilo.Products
 
             // NOTE: In SMS task completes when the onNextAsync completes on the receiver. 
             //       In azure queue this will return as soon the msg in queued.
-            await stream.OnNextAsync(product); // TODO: await? 
+            await stream.OnNextAsync(product);
             // TODO: manage error handling: if the Task fails, retry
 
             // add the product in all inventories
@@ -39,14 +39,14 @@ namespace OrleansSilo.Products
             //       in this way it should be faster too
             var gi = GrainFactory.GetGrain<IInventories>(Guid.Empty);
             var inventories = await gi.GetAll();
-            foreach (var inventory in inventories)
+            foreach (var inventoryGuid in inventories)
             {
-                var gx = GrainFactory.GetGrain<IInventory>(inventory.Id);
+                var gx = GrainFactory.GetGrain<IInventory>(inventoryGuid);
                 await gx.AddProduct(product.Id);
             }
 
             State = product;
-            await base.WriteStateAsync(); // TODO: await?
+            await base.WriteStateAsync();
 
             _logger.Info($"Product created => {product.Id}");
 

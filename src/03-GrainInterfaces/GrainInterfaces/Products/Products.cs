@@ -4,13 +4,11 @@ using System.Collections.Generic;
 
 namespace GrainInterfaces.Products
 {
-    [ProtoContract]
-    [Serializable]
-    public class Products
-    {
-        [ProtoMember(1)]
-        public List<Guid> Items;
-        //[ProtoMember(2)]
-        //public DateTimeOffset LastUpdateDate;
-    }
+    //[ProtoContract]
+    //[Serializable]
+    //public class Products
+    //{
+    //    [ProtoMember(1)]
+    //    public List<Guid> Items;
+    //}
 }

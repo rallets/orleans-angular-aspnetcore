@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-
 namespace TestClient
 {
     public static class Test_Products
@@ -60,12 +59,11 @@ namespace TestClient
                 async item =>
                 {
                     var name = $"{item.ToString("000")}/{batchSize}";
-                    //var productGuid = await Add(client, name);
 
-                    var productId = Guid.NewGuid();
+                    var productGuid = Guid.NewGuid();
                     var price = Math.Round(Convert.ToDecimal(new Random().NextDouble() * 1000), 2);
 
-                    var product = client.GetGrain<IProduct>(productId);
+                    var product = client.GetGrain<IProduct>(productGuid);
                     var response = await product.Create(new Product
                     {
                         Code = $"Product {name}",

@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Orleans.Statistics;
 
 
 // TODO: use user-secrets - from https://www.twilio.com/blog/2018/05/user-secrets-in-a-net-core-console-app.html
@@ -102,10 +103,15 @@ namespace OrleansSilo
                     options.ServiceId = "OrleansTest";
                 })
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(ProductsGrain).Assembly).WithReferences())
-                .ConfigureLogging(logging => logging.AddConsole())
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddFilter("Orleans.Runtime.Management.ManagementGrain", LogLevel.Warning);
+                    builder.AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning);
+                    builder.AddConsole();
+                })
 
-                // .UseDashboard(options => { })
-                // .UsePerfCounterEnvironmentStatistics()
+                 .UseDashboard(options => { })
+                 .UsePerfCounterEnvironmentStatistics()
 
                 .AddAzureTableGrainStorage("TableStore", options => options.ConnectionString = "UseDevelopmentStorage=true")
                 .AddAzureBlobGrainStorage("BlobStore", options => options.ConnectionString = "UseDevelopmentStorage=true")
@@ -114,11 +120,14 @@ namespace OrleansSilo
 
                 // .AddSimpleMessageStreamProvider("SMSProvider")
                 // .AddMemoryGrainStorage("PubSubStore")
+                
                 .AddAzureQueueStreams<AzureQueueDataAdapterV2>("AzureQueueProvider", optionsBuilder => optionsBuilder.Configure(options => { options.ConnectionString = "UseDevelopmentStorage=true"; }))
                 .AddAzureTableGrainStorage("PubSubStore", options => { options.ConnectionString = "UseDevelopmentStorage=true"; })
-                // .AddMemoryGrainStorage("PubSubStore")
 
                 .AddLogStorageBasedLogConsistencyProvider("LogStorage")
+
+                .AddAzureTableTransactionalStateStorage("TransactionStore", options => { options.ConnectionString = "UseDevelopmentStorage=true"; })
+                .UseTransactions()
 
             .Build();
         }
