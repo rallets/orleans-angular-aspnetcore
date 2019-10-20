@@ -117,7 +117,18 @@ namespace OrleansSilo
             }
 
             products = await Test_Products.GetAll(client);
-            if(products.Length < numProducts)
+
+            var totMsExists = 0d;
+            var totMsCreated = 0d;
+            for (int n = 0; n < 10; n++)
+            {
+                totMsExists += await Test_Products.ExistsBatch(client, numProducts, 100, products);
+                totMsCreated += await Test_Products.CreatedBatch(client, numProducts, 100, products);
+            }
+            Console.WriteLine($"Check for exists for products - Time elapsed: {totMsExists} ms - {(products.Length == 0 ? 0 : totMsExists / products.Length)} for product");
+            Console.WriteLine($"Check for created for products - Time elapsed: {totMsCreated} ms - {(products.Length == 0 ? 0 : totMsCreated / products.Length)} for product");
+
+            if (products.Length < numProducts)
             {
                 var x = "wait for streaming";
             }

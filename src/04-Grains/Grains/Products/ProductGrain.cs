@@ -22,6 +22,8 @@ namespace OrleansSilo.Products
             _logger = logger;
         }
 
+        public Task<bool> Created() => Task.FromResult(State?.CreationDate != DateTimeOffset.MinValue);
+
         public async Task<Product> Create(Product product)
         {
             product.Id = this.GetPrimaryKey();

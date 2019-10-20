@@ -61,8 +61,8 @@ namespace WebApi.Controllers
         {
             foreach(var item in request.Items)
             {
-                var exists = await _orleansClient.GetGrain<IProducts>(Guid.Empty).Exists(item.ProductId);
-                if(!exists)
+                var exists = await _orleansClient.GetGrain<IProduct>(item.ProductId).Created();
+                if (!exists)
                 {
                     return NotFound();
                 }

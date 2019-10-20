@@ -110,8 +110,8 @@ namespace OrleansSilo
                     builder.AddConsole();
                 })
 
-                 .UseDashboard(options => { })
-                 .UsePerfCounterEnvironmentStatistics()
+                 //.UseDashboard(options => { })
+                 //.UsePerfCounterEnvironmentStatistics()
 
                 .AddAzureTableGrainStorage("TableStore", options => options.ConnectionString = "UseDevelopmentStorage=true")
                 .AddAzureBlobGrainStorage("BlobStore", options => options.ConnectionString = "UseDevelopmentStorage=true")
