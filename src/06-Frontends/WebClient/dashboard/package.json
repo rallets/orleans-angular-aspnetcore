@@ -36,7 +36,7 @@
     "cerialize": "^0.1.18",
     "core-js": "^3.1.4",
     "font-awesome": "^4.7.0",
-    "lodash-es": "^4.17.15",
+    "lodash-es": "^4.17.21",
     "ngx-take-until-destroy": "^5.4.0",
     "rxjs": "~6.5.3",
     "tslib": "^1.10.0",
